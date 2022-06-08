@@ -2,33 +2,33 @@
 
 namespace Tests\Feature\End2End;
 
-use App\Models\AssayClass;
+use App\Models\CodingSystem;
 use Tests\Feature\End2End\TestCase;
 use Illuminate\Testing\TestResponse;
-use Tests\traits\SetsUpAssayClass;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\traits\SetsUpCodingSystem;
 
-class AssayClassCreateTest extends TestCase
+class CodingSystemUpdateTest extends TestCase
 {
-    use SetsUpAssayClass;
+    use RefreshDatabase;
+    use SetsUpCodingSystem;
 
     /**
      * @test
      */
-    public function creates_a_new_assay_class_from_data()
+    public function updates_an_assay_class()
     {
         $this->makeRequest()
-            ->assertStatus(201)
+            ->assertStatus(200)
             ->assertJson([
-                'name' => 'test name',
-                'description' => 'test description'
+                'name' => 'updated name',
             ]);
-        
-        $this->assertDatabaseHas('assay_classes', [
-            'name' => 'test name',
-            'description' => 'test description'
+
+        $this->assertDatabaseHas('coding_systems',  [
+            'name' => 'updated name',
         ]);
     }
-    
+
     /**
      * @test
      */
@@ -36,7 +36,7 @@ class AssayClassCreateTest extends TestCase
     {
         $this->makeRequest([])
             ->assertValidationErrors([
-                'name' => 'This is required.'
+                'name' => 'This is required.',
             ]);
 
         $this->makeRequest(['name' => str_repeat('x', 256)])
@@ -44,21 +44,21 @@ class AssayClassCreateTest extends TestCase
                 'name' => 'This must not be greater than 255 characters.'
             ]);
 
-        $this->makeRequest(['name' => $this->assayClass->name])
+        $otherClass = CodingSystem::factory()->create();
+        $this->makeRequest(['name' => $otherClass->name])
             ->assertValidationErrors([
                 'name' => 'The name has already been taken.'
             ]);
     }
+    
 
     private function makeRequest($data = null): TestResponse
     {
         $data = $data ?? [
-            'name' => 'test name',
-            'description' => 'test description'
+            'name' => 'updated name',
         ];
-        $response = $this->json('POST', '/api/assay-classes', $data);
 
-        return $response;
+        return $this->json('PUT', '/api/coding-systems/'.$this->codingSystem->id, $data);
     }
     
     

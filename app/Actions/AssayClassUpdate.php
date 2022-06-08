@@ -19,7 +19,7 @@ class AssayClassUpdate
 
     public function asController(ActionRequest $request, AssayClass $assayClass)
     {
-        return $this->handle($assayClass, $request->only(['name', 'description']));
+        return $this->handle($assayClass, $request->validated());
     }
 
     public function rules(ActionRequest $request): array

@@ -2,30 +2,27 @@
 
 namespace Tests\Feature\End2End;
 
-use App\Models\AssayClass;
 use Tests\Feature\End2End\TestCase;
 use Illuminate\Testing\TestResponse;
-use Tests\traits\SetsUpAssayClass;
+use Tests\traits\SetsUpCodingSystem;
 
-class AssayClassCreateTest extends TestCase
+class CodingSystemCreateTest extends TestCase
 {
-    use SetsUpAssayClass;
+    use SetsUpCodingSystem;
 
     /**
      * @test
      */
-    public function creates_a_new_assay_class_from_data()
+    public function creates_a_new_coding_system_from_data()
     {
         $this->makeRequest()
             ->assertStatus(201)
             ->assertJson([
                 'name' => 'test name',
-                'description' => 'test description'
             ]);
         
-        $this->assertDatabaseHas('assay_classes', [
+        $this->assertDatabaseHas('coding_systems', [
             'name' => 'test name',
-            'description' => 'test description'
         ]);
     }
     
@@ -44,7 +41,7 @@ class AssayClassCreateTest extends TestCase
                 'name' => 'This must not be greater than 255 characters.'
             ]);
 
-        $this->makeRequest(['name' => $this->assayClass->name])
+        $this->makeRequest(['name' => $this->codingSystem->name])
             ->assertValidationErrors([
                 'name' => 'The name has already been taken.'
             ]);
@@ -54,13 +51,9 @@ class AssayClassCreateTest extends TestCase
     {
         $data = $data ?? [
             'name' => 'test name',
-            'description' => 'test description'
         ];
-        $response = $this->json('POST', '/api/assay-classes', $data);
+        $response = $this->json('POST', '/api/coding-systems', $data);
 
         return $response;
     }
-    
-    
-    
 }

@@ -26,4 +26,10 @@ class CodingSystem extends Model
     {
         return $this->hasMany(Publication::class);
     }
+
+    public function scopeFilter($query, $term)
+    {
+        return $query->orWhere('name', 'like', '%'.$term.'%');
+    }
+    
 }

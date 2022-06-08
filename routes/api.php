@@ -5,7 +5,12 @@ use App\Actions\AssayClassFind;
 use App\Actions\AssayClassList;
 use App\Actions\AssayClassCreate;
 use App\Actions\AssayClassUpdate;
+use App\Actions\CodingSystemFind;
+use App\Actions\CodingSystemList;
+use App\Actions\CodingSystemCreate;
+use App\Actions\CodingSystemUpdate;
 use Illuminate\Support\Facades\Route;
+use App\Actions\OtherAssayClassCreate;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,3 +35,13 @@ Route::group([
     Route::get('/{assayClass}', AssayClassFind::class);
     Route::put('/{assayClass}', AssayClassUpdate::class);
 });
+
+Route::group([
+    'prefix' => 'coding-systems'
+], function () {
+    Route::post('/', CodingSystemCreate::class);
+    Route::get('/', CodingSystemList::class);
+    Route::get('/{codingSystem}', CodingSystemFind::class);
+    Route::put('/{codingSystem}', CodingSystemUpdate::class);
+}
+);
