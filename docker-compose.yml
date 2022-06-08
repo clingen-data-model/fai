@@ -1,0 +1,66 @@
+version: "3"
+services: 
+    database:
+        container_name: ${DOCKER_NAME}-db
+        image: mysql:8.0
+        ports:
+            - "13309:3306"
+        volumes:
+            - .docker/mysql/data:/var/lib/mysql
+        environment:
+            - MYSQL_DATABASE=${DB_DATABASE}
+            - MYSQL_ROOT_PASSWORD=root
+            - MYSQL_USER=${DB_USERNAME}
+            - MYSQL_PASSWORD=${DB_PASSWORD}
+            - MYSQL_SORT_BUFFER_SIZE=256000000
+    app:
+        build: .
+        image: ${DOCKER_NAME}-app
+        container_name: ${DOCKER_NAME}-app
+        sysctls:
+            - net.ipv4.ip_unprivileged_port_start=0
+        depends_on:
+            - database
+            - redis
+        ports:
+            - "8080:8080"
+        links:
+            - database:database
+            - redis:redis
+        volumes:
+            - .:/srv/app
+        environment:
+            CONTAINER_ROLE: app
+            CONTAINER_ENV: local
+    redis:
+        container_name: ${DOCKER_NAME}-redis
+        image: centos/redis-5-centos7
+        ports:
+            - "6379:6379"
+        environment:
+            - REDIS_PASSWORD=${REDIS_PASSWORD}
+    # scheduler:
+    #     image: ${DOCKER_NAME}-app
+    #     container_name: ${DOCKER_NAME}-scheduler
+    #     sysctls: 
+    #         - net.ipv4.ip_unprivileged_port_start=0
+    #     depends_on: 
+    #         - app
+    #     volumes:
+    #         - .:/srv/app
+    #     environment:
+    #         CONTAINER_ROLE: scheduler
+    #         CONTAINER_ENV: local
+    # queue:
+    #     image: ${DOCKER_NAME}-app
+    #     container_name: ${DOCKER_NAME}-queue
+    #     sysctls: 
+    #         - net.ipv4.ip_unprivileged_port_start=0
+    #     depends_on: 
+    #         - app
+    #     volumes:
+    #         - .:/srv/app
+    #     environment:
+    #         CONTAINER_ROLE: queue
+    #         CONTAINER_ENV: local        
+        
