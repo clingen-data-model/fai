@@ -21,9 +21,9 @@ return new class extends Migration
             $table->boolean('approved')->default(false);
             $table->json('material_used')->nullable();
             $table->json('patient_derived_material_used')->nullable();
-            $table->string('description')->nullable();
+            $table->text('description')->nullable();
             // additional_document: Optional[List[str]] = None
-            $table->string('read_out_description')->nullable();
+            $table->text('read_out_description')->nullable();
             $table->string('range')->nullable();
             $table->string('normal_range')->nullable();
             $table->string('abnormal_range')->nullable();
@@ -33,8 +33,8 @@ return new class extends Migration
             $table->text('replication');
             $table->text('statistical_analysis_description');
             $table->string('significance_threshold')->nullable();
-            $table->string('comment')->nullable();
-            $table->enum('range_type', ['qantitative', 'qualitative']);
+            $table->text('comment')->nullable();
+            $table->enum('range_type', ['quantitative', 'qualitative']);
             $table->string('units')->nullable();
 
             # Fields from ER 

@@ -20,4 +20,15 @@ abstract class TestCase extends BaseTestCase
         });    
     }
     
+    protected function jsonifyArrays($data): array
+    {
+        $jsonified = [];
+        foreach ($data as $key => $val) {
+            if (is_array($val)) {
+                $val = json_encode($val);
+            }
+            $jsonified[$key] = $val;
+        }
+        return $jsonified;
+    }
 }

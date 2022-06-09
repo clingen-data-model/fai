@@ -30,7 +30,7 @@ class FunctionalAssay extends Model
         'validation_control_benign',
         'replication',
         'statistical_analysis_description',
-        'significance_treshold',
+        'significance_threshold',
         'comment',
         'range_type',
         'units',
@@ -44,7 +44,7 @@ class FunctionalAssay extends Model
         'approved' => 'boolean',
         'material_used' => 'array',
         'patient_derived_material_used' => 'array',
-        'field_nots' => 'array'
+        'field_notes' => 'array'
     ];
     
     /**

@@ -9,20 +9,21 @@ use Tests\traits\SetsUpCodingSystem as TraitsSetsUpCodingSystem;
 /**
  * Methods for setting up CodingSystem
  */
-trait SetsUpCodingSystem 
+trait SetsUpPublication 
 {
     use TraitsSetsUpCodingSystem;
 
-    public function setUpPublication()
+    public function setUpSetsUpPublication()
     {
-        $this->setupCodingSystem();
-        $this->publication = $this->createPublication([
-            'coding_systm_id' => $this->codingSystemId
-        ]);
+        $this->setupSetsUpCodingSystem();
+        $this->publication = $this->createPublication();
     }
 
     protected function createPublication($data = null)
     {
+        $data = $data ?? [
+            'coding_system_id' => $this->codingSystem->id
+        ];
         return Publication::factory()->create($data);
     }
     

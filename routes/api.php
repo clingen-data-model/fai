@@ -3,13 +3,20 @@
 use Illuminate\Http\Request;
 use App\Actions\AssayClassFind;
 use App\Actions\AssayClassList;
+use App\Actions\PublicationFind;
+use App\Actions\PublicationList;
 use App\Actions\AssayClassCreate;
 use App\Actions\AssayClassUpdate;
 use App\Actions\CodingSystemFind;
 use App\Actions\CodingSystemList;
+use App\Actions\PublicationCreate;
+use App\Actions\PublicationUpdate;
 use App\Actions\CodingSystemCreate;
 use App\Actions\CodingSystemUpdate;
+use App\Actions\FunctionalAssayFind;
+use App\Actions\FunctionalAssayList;
 use Illuminate\Support\Facades\Route;
+use App\Actions\FunctionalAssayCreate;
 use App\Actions\OtherAssayClassCreate;
 
 /*
@@ -43,5 +50,23 @@ Route::group([
     Route::get('/', CodingSystemList::class);
     Route::get('/{codingSystem}', CodingSystemFind::class);
     Route::put('/{codingSystem}', CodingSystemUpdate::class);
-}
-);
+});
+
+Route::group([
+    'prefix' => 'functional-assays'
+], function () {
+    Route::post('/', FunctionalAssayCreate::class);
+    Route::get('/', FunctionalAssayList::class);
+    Route::get('/{functionalAssay}', FunctionalAssayFind::class);
+    // Route::put('/{functionalAssay}', FunctionalAssayUpdate::class);
+});
+
+
+Route::group([
+    'prefix' => 'publications'
+], function () {
+    Route::post('/', PublicationCreate::class);
+    Route::get('/', PublicationList::class);
+    Route::get('/{publication}', PublicationFind::class);
+    Route::put('/{publication}', PublicationUpdate::class);
+});

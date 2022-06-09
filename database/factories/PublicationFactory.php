@@ -17,7 +17,7 @@ class PublicationFactory extends Factory
     public function definition()
     {
         return [
-            'title' => $this->faker()->sentence,
+            'title' => $this->faker->sentence,
             'coding_system_id' => null,
             'code' => $this->faker->numberBetween(1)
         ];
