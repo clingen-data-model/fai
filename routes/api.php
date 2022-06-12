@@ -17,6 +17,7 @@ use App\Actions\FunctionalAssayFind;
 use App\Actions\FunctionalAssayList;
 use Illuminate\Support\Facades\Route;
 use App\Actions\FunctionalAssayCreate;
+use App\Actions\FunctionalAssayUpdate;
 use App\Actions\OtherAssayClassCreate;
 
 /*
@@ -58,7 +59,7 @@ Route::group([
     Route::post('/', FunctionalAssayCreate::class);
     Route::get('/', FunctionalAssayList::class);
     Route::get('/{functionalAssay}', FunctionalAssayFind::class);
-    // Route::put('/{functionalAssay}', FunctionalAssayUpdate::class);
+    Route::put('/{functionalAssay}', FunctionalAssayUpdate::class);
 });
 
 

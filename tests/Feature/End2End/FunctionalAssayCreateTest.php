@@ -94,37 +94,5 @@ class FunctionalAssayCreateTest extends TestCase
 
         return $this->json('POST', '/api/functional-assays', $data);
     }
-
-    private function getDefaultData(): array
-    {
-        return [
-            'affiliation_id' => 50001,
-            'publication_id' => $this->publication->id,
-            'hgnc_id' => 'HGNC:12345',
-            'approved' => false,
-            'material_used' => ['a', 'b', 'c'],
-            'patient_derived_material_used' => ['a1', 'b1', 'c1'],
-            'description' => 'This is a description',
-            //  => additional_document: Optional[List[str]] = None
-            'read_out_description' => 'read out description',
-            'range' => 'a to g',
-            'normal_range' => 'a - c',
-            'abnormal_range' => 'f - g',
-            'indeterminate_range' => 'd - e',
-            'validation_control_pathogenic' => 'validation control pathogenic',
-            'validation_control_benign' => 'validation control benign',
-            'replication' => 'replication',
-            'statistical_analysis_description' => 'statistical_analysis_description',
-            'significance_threshold' => 'significance_threshold',
-            'comment' => 'comment',
-            'range_type' => 'quantitative',
-            'units' => 'units',
-            'field_notes' => ["notes" => "test"],
-            'assay_notes' =>'assay_notes',
-            'assay_class_ids' => [1, 2]
-        ];
-    }
-    
-    
     
 }
