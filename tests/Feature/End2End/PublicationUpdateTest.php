@@ -35,11 +35,6 @@ class PublicationUpdateTest extends TestCase
      */
     public function validates_parameters()
     {
-        $this->makeRequest([])
-            ->assertValidationErrors([
-                'title' => 'This is required.',
-            ]);
-
         $this->makeRequest(['title' => str_repeat('x', 256)])
             ->assertValidationErrors([
                 'title' => 'This must not be greater than 255 characters.'
