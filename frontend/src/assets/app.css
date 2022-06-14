@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+h1, h2, h3, h4, h5 {
+    @apply font-bold
+}
+
+h1 {
+    font-size: 2rem;
+}
+h2 {
+    font-size: 1.5rem
+}
+
+h3 {
+    font-size: 1.25rem
+}
+
+h4 {
+    font-size: 1.15rem
+}
+
+hr {
+    @apply my-2
+}
+
+input,
+textarea,
+select
+{
+    @apply border px-2 py-1 rounded-lg border-gray-300
+}
+
+a {
+    @apply text-blue-700 hover:underline;
+}
+
+a.black {
+    @apply text-inherit;
+}
+
+a.btn {
+    @apply text-inherit no-underline inline-block;
+}
+
+.btn
+{
+    @apply border rounded-lg px-3 py-1;
+    @apply bg-gradient-to-b active:bg-gradient-to-t from-white to-gray-50;
+}
+
+.btn.lg
+{
+    @apply px-4 py-2;
+    font-size: 1.35rem;
+}
+
+.btn.sm
+{
+    @apply px-2 py-1;
+    font-size: .95rem
+}
+
+.btn.xs
+{
+    @apply px-2 py-1 rounded;
+    font-size: .75rem
+}
+
+.btn.blue
+{
+    @apply bg-gradient-to-t from-blue-600 to-blue-500 active:bg-gradient-to-b text-white border-blue-600
+}
+
+.btn.red
+{
+    @apply bg-gradient-to-t from-red-600 to-red-500 active:bg-gradient-to-b text-white border-red-600
+}
+
+.btn.yellow
+{
+    @apply bg-gradient-to-t from-yellow-400 to-yellow-300 active:bg-gradient-to-b border-yellow-400
+}
