@@ -46,6 +46,11 @@ class PublicationCreateTest extends TestCase
         ->assertValidationErrors([
             'code' => 'The code has already been taken.'
         ]);
+
+        $this->makeRequest(['title' => str_repeat('X', 256)])
+            ->assertValidationErrors([
+                'title' => 'This must not be greater than 255 characters.'
+            ]);
     }
     
 

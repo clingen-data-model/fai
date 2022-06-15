@@ -24,6 +24,7 @@ class PublicationCreate
     public function rules(ActionRequest $request): array
     {
         return [
+            'title' => ['nullable', 'max:255'],
             'coding_system_id' => ['required', 'exists:coding_systems,id'],
             'code' => [ 
                         'required', 
