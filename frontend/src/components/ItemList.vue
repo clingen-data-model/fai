@@ -9,10 +9,10 @@
     });
 
     const slots = useSlots();
-    const attrs = useAttrs();
+    // const attrs = useAttrs();
 
-    console.log({slots});
-    console.log({attrs});
+    // console.log({slots});
+    // console.log({attrs});
 
     const render = () => {
         if (props.items.length > 0) {

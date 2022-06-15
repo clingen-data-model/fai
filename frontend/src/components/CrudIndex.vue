@@ -63,16 +63,18 @@
 
         <item-list :items="items">
             <template v-slot="item">
-                <div class="flex py-2 w-full border-b justify-between">
-                    <div>
-                        <h4>{{item.name}}</h4>
-                        <div>{{item.description}}</div>
+                    <div class="flex py-2 w-full border-b justify-between">
+                        <div>
+                            <slot :item="item" name="listItemDisplay">
+                                <h4>{{item.name}}</h4>
+                                <div>{{item.description}}</div>
+                            </slot>
+                        </div>
+                        <ul>
+                            <li><router-link :to="buildEditRoute(item)" class="text-xs">Edit</router-link></li>
+                            <li><router-link :to="buildDeleteRoute(item)" class="text-xs">Delete</router-link></li>
+                        </ul>
                     </div>
-                    <ul>
-                        <li><router-link :to="buildEditRoute(item)" class="text-xs">Edit</router-link></li>
-                        <li><router-link :to="buildDeleteRoute(item)" class="text-xs">Delete</router-link></li>
-                    </ul>
-                </div>
             </template>
         </item-list>
 

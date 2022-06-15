@@ -70,8 +70,42 @@ const routes = [
     },
 
     { name: 'CodingSystemDelete',
-        path: '/coding-system/:id/delete',
+        path: '/coding-systems/:id/delete',
         component: () => import('@/views/CodingSystemDelete.vue'),
+        meta: {
+            protected: true
+        },
+        props: true
+    },
+
+    { name: 'PublicationIndex',
+        path: '/publications',
+        component: () => import('@/views/PublicationIndex.vue'),
+        meta: {
+            protected: true,
+        },
+    },
+
+    { name: 'PublicationCreate',
+        path: '/publications/create',
+        component: () => import('@/views/PublicationCreate.vue'),
+        meta: {
+            protected: true,
+        },
+    },
+
+    { name: 'PublicationUpdate',
+        path: '/publications/:id/edit',
+        component: () => import('@/views/PublicationUpdate.vue'),
+        meta: {
+            protected: true,
+        },
+        props: true
+    },
+
+    { name: 'PublicationDelete',
+        path: '/publications/:id/delete',
+        component: () => import('@/views/PublicationDelete.vue'),
         meta: {
             protected: true
         },

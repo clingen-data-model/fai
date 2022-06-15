@@ -13,12 +13,10 @@ import AssayClassIndex from '@/views/AssayClassIndex.vue'
             <router-link to="/" class="black">FuncEvInt</router-link>
           </div>
           
-          <router-link 
-            to="/assay-classes" 
-            class="black block " 
-          >Assay Classes</router-link> 
-
+          <router-link to="/assay-classes" class="black block ">Assay Classes</router-link> 
           <router-link to="/coding-systems" class="black block ">Coding Systems</router-link>
+          <router-link to="/publications" class="black block ">Publications</router-link>
+
           <DropdownMenu orientation="left">
             <template #label>Dev</template>
             <DropdownItem>
