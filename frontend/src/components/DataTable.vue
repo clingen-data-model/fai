@@ -58,9 +58,9 @@
                                         <icon-cheveron-up icon-color="#333" 
                                             v-if="realSort.field == field && !realSort.desc"
                                         ></icon-cheveron-up>
-                                        <icon-cheveron-down icon-color="#333" 
+                                        <IconCheveronDown icon-color="#333" 
                                             v-if="realSort.field == field && realSort.desc"
-                                        ></icon-cheveron-down>
+                                        ></IconCheveronDown>
                                     </div>
                                 </div>
                             </div>

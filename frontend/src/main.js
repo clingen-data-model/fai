@@ -8,6 +8,7 @@ const app = createApp(App)
 const registerComponents = (components => {
     Object.entries(components).forEach(([path, definition]) => {
         const componentName = path.split('/').pop().replace(/\.\w+$/, '')
+        console.log(componentName);
         app.component(componentName, definition.default)
     })
 })

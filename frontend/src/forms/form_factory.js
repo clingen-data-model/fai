@@ -1,6 +1,5 @@
 import {ref} from 'vue'
-import is_validation_error from '@/http/is_validation_error'
-import api from '@/http'
+import {api, isValidationError} from '@/http'
 
 export const errors = ref({});
 const editing = ref(false);

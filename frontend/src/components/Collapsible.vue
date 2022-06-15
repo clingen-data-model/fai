@@ -3,7 +3,7 @@
         <div class="collapsible-header" @click="expanded = !expanded">
             <div class="flex items-center">
                 <icon-cheveron-right v-if="!expanded" class="-ml-1" />
-                <icon-cheveron-down v-if="expanded" class="-ml-1" />
+                <IconCheveronDown v-if="expanded" class="-ml-1" />
                 <slot name="title">
                     <strong>{{title}}</strong>
                 </slot>

@@ -44,6 +44,8 @@
                 <button class="btn yellow">yellow button</button>
                 <br>
                 <a href="#" class="btn">link as button</a>
+                <br>
+                <button class="link">Button as link</button>
             </div>
         </div>
     </div>

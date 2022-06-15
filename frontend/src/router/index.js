@@ -41,6 +41,43 @@ const routes = [
         props: true
     },
 
+    { name: 'CodingSystemIndex',
+        path: '/coding-systems',
+        component: () => import('@/views/CodingSystemIndex.vue'),
+        meta: {
+            protected: true,
+            permissions: ['coding-systems-create']
+        },
+    },
+
+    { name: 'CodingSystemCreate',
+        path: '/coding-systems/create',
+        component: () => import('@/views/CodingSystemCreate.vue'),
+        meta: {
+            protected: true,
+            permissions: ['coding-systems-create']
+        },
+    },
+
+    { name: 'CodingSystemUpdate',
+        path: '/coding-systems/:id/edit',
+        component: () => import('@/views/CodingSystemUpdate.vue'),
+        meta: {
+            protected: true,
+            permissions: ['coding-systems-update']
+        },
+        props: true
+    },
+
+    { name: 'CodingSystemDelete',
+        path: '/coding-system/:id/delete',
+        component: () => import('@/views/CodingSystemDelete.vue'),
+        meta: {
+            protected: true
+        },
+        props: true
+    },
+
     { name: 'StyleGuid',
         path: '/dev/style-guide',
         component: () => import('@/views/dev/StyleGuide.vue'),

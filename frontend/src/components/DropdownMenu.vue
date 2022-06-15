@@ -80,7 +80,7 @@ export default {
     //                     onClick={this.toggleMenu}
     //                 >
     //                     <span v-show={!this.hideCheveron}>
-    //                         <icon-cheveron-down />
+    //                         <IconCheveronDown />
     //                     </span>
     //                     {this.$slots.label ? this.$slots.label() : this.label}
     //                 </div>
@@ -126,7 +126,7 @@ export default {
                 @click.stop="toggleMenu"
             >
                 <span v-show="!hideCheveron">
-                    <icon-cheveron-down />
+                    <IconCheveronDown class="inline-block"/>
                 </span>
                 <slot name="label">{{this.label}}</slot>
             </div>

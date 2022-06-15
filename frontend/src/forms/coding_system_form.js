@@ -1,34 +1,37 @@
 import {ref} from 'vue'
 import {api, isValidationError} from '@/http'
 
-export const errors = ref({})
-export const currentItem = ref({});
-export const originalItem = ref({});
+export const currentItem = ref({})
+export const originalItem = ref({})
+export const errors = ref({});
 
 export const fields = [
     {
-        name: 'name'
+        name: 'name',
+        type: 'text',
+        placeholder: 'My coding system'
     },
     {
         name: 'description',
         type: 'large-text',
-        placeholder: 'A description of the assay class.'
+        placeholder: 'This coding system is the best...'
     }
 ]
 
 export const find = async (id) => {
-    return await api.get(`/assay-classes/${id}`).then(response => {
-        currentItem.value = response.data
-        originalItem.value = response.data
-        return response.data
-    });
+    return await api.get(`/coding-systems/${id}`)
+        .then(response => {
+            currentItem.value = response.data
+            originalItem.value = response.data
+            return response.data
+        });
 }
 
 export const save = async (data) => {
-    errors.value = {};
+    clearErrors()
     try {
-        await api.post('/assay-classes', data);
-        currentItem.value = {};
+        await api.post('/coding-systems', data);
+        clearCurrentItem()
     } catch (e) {
         if (isValidationError(e)) {
             errors.value = e.response.data.errors
@@ -38,9 +41,9 @@ export const save = async (data) => {
 }
 
 export const update = async (data) => {
-    errors.value = {}
+    clearErrors()
     try {
-        currentItem.value = await api.put(`/assay-classes/${data.id}`, data)
+        currentItem.value = await api.put(`/coding-systems/${data.id}`, data)
             .then(response => response.data);
     } catch (e) {
         if (isValidationError(e)) {
@@ -74,9 +77,9 @@ export const clearErrors = () => {
 
 export default {
     fields,
-    errors,
     currentItem,
     originalItem,
+    errors,
     find,
     save,
     update,

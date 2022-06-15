@@ -1,7 +1,9 @@
 <script setup></script>
 
 <template>
-    <div>
-        <h1>Dashboard</h1>
-    </div>
+    <ScreenTemplate>
+        <template #header>
+            <h1>Dashboard</h1> 
+        </template>
+    </ScreenTemplate>
 </template>
