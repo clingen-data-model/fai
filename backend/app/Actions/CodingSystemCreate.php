@@ -21,7 +21,7 @@ class CodingSystemCreate
 
     public function asController(ActionRequest $request)
     {
-        return $this->handle($request->only('name'));
+        return $this->handle($request->validated());
     }
 
     public function rules(ActionRequest $request): array
@@ -33,6 +33,7 @@ class CodingSystemCreate
                Rule::unique('coding_systems', 'name')
                 ->ignore($request->codingSystem)
             ],
+            'description' => 'nullable'
         ];
     }
     

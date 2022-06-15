@@ -11,7 +11,7 @@ class CodingSystem extends Model
 {
     use HasFactory;
 
-    public $fillable = ['name'];
+    public $fillable = ['name', 'description'];
 
     public $casts = [
         'id' => 'integer'

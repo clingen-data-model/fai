@@ -19,10 +19,12 @@ class CodingSystemCreateTest extends TestCase
             ->assertStatus(201)
             ->assertJson([
                 'name' => 'test name',
+                'description' => 'test description'
             ]);
         
         $this->assertDatabaseHas('coding_systems', [
             'name' => 'test name',
+            'description' => 'test description',
         ]);
     }
     
@@ -51,6 +53,7 @@ class CodingSystemCreateTest extends TestCase
     {
         $data = $data ?? [
             'name' => 'test name',
+            'description' => 'test description'
         ];
         $response = $this->json('POST', '/api/coding-systems', $data);
 
