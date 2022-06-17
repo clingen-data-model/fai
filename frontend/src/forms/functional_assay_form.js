@@ -50,7 +50,14 @@ export const fields = ref([
         placeholder: 'HGNC:1234',
         required: true
     },
-    { name: 'approved', type: 'checkbox' },
+    { 
+        name: 'approved', 
+        type: 'radio-group',
+        options: [
+            {label: 'Yes', value: 1},
+            {label: 'No', value: 0},
+        ]
+    },
     { name: 'material_used', type: 'large-text' },
     { name: 'patient_derived_material_used', type: 'large-text' },
     { name: 'description', type: 'large-text' },
