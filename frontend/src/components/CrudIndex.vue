@@ -7,10 +7,6 @@
             type: String,
             requird: true
         },
-        title: {
-            type: String,
-            required: true
-        },
         addButtonLabel: {
             type: String,
             default: 'Add'
@@ -55,14 +51,11 @@
 </script>
 
 <template>
-    <ScreenTemplate>
-        <template v-slot:header>
-            <h1>{{title}}</h1>
-            <router-link :to="{name: createRouteName}" class="btn xs">{{addButtonLabel}}</router-link>
-        </template>
+    <div>
 
-        <item-list :items="items">
-            <template v-slot="item">
+        <slot :items="items">
+            <item-list :items="items">
+                <template v-slot="item">
                     <div class="flex py-2 w-full border-b justify-between">
                         <div>
                             <slot :item="item" name="listItemDisplay">
@@ -75,10 +68,10 @@
                             <li><router-link :to="buildDeleteRoute(item)" class="text-xs">Delete</router-link></li>
                         </ul>
                     </div>
-            </template>
-        </item-list>
-
-    </ScreenTemplate>
+                </template>
+            </item-list>
+        </slot>
+    </div>
 </template>
 
 <style scoped>
