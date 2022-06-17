@@ -29,7 +29,8 @@ input,
 textarea,
 select
 {
-    @apply border px-2 py-1 rounded-lg border-gray-300
+    @apply border px-2 py-1 rounded border-gray-300;
+    @apply px-1 py-0.5 text-sm;
 }
 
 a, button.link {
