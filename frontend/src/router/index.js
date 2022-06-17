@@ -112,7 +112,26 @@ const routes = [
         props: true
     },
 
-    { name: 'StyleGuid',
+    {
+        name: 'FunctionalAssayIndex',
+        path: '/functional-assays',
+        component: () => import('@/views/FunctionalAssayIndex.vue'),
+        metadata: {
+            protected: true
+        },
+        props: true
+    },
+    {
+        name: 'FunctionalAssayCreate',
+        path: '/functional-assays/create',
+        component: () => import('@/views/FunctionalAssayCreate.vue'),
+        metadata: {
+            protected: true
+        },
+        props: true
+    },
+
+    { name: 'StyleGuide',
         path: '/dev/style-guide',
         component: () => import('@/views/dev/StyleGuide.vue'),
     }
