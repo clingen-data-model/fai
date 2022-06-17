@@ -3,7 +3,6 @@ import {ref, watch} from 'vue';
 
 export const mirrorProps = {
     modelValue: {
-        type: Object,
         required: true
     }
 };
@@ -15,11 +14,8 @@ export const mirrorEmits = [
 
 export const setupMirror = (props, context) => {
     const workingCopy = ref({});
+
     watch(() => props.modelValue, function (to) {
-        if (typeof props.modelValue.clone == 'function') {
-            const clone = props.modelValue.clone();
-            workingCopy.value = clone;
-        }
         if (!isEqual(to, workingCopy.value)) {
             workingCopy.value = cloneDeep(to);
         }
