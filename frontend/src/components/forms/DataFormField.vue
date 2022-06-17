@@ -14,7 +14,12 @@
             :errors="errors[field.name]"
             :vertical="field.vertical"
         >
-            <component :is="field.component" v-model="fieldValue" :errors="errors"/>
+            <component 
+                :is="field.component.component" 
+                v-bind="field.component.options"
+                v-model="fieldValue" 
+                :errors="errors" 
+            />
         </input-row>
 
         <input-row v-else 
@@ -53,9 +58,12 @@ export default {
                 if (this.field.name === '*') {
                     return this.workingCopy;
                 }
-                return get(this.workingCopy, this.field.name);
+                const val = get(this.workingCopy, this.field.name);
+                // console.log('get FieldValue: ', this.field.name, val);
+                return val;
             },
             set (value) {
+                // console.log('setValue', this.field.name, value)
                 if (this.field.name === '*') {
                     this.workingCopy = value
                     return;
