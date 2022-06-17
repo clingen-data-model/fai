@@ -99,6 +99,11 @@ button.yellow
     @apply bg-gradient-to-t from-yellow-400 to-yellow-300 active:bg-gradient-to-b border-yellow-400
 }
 
+.container {
+    width: 800px;
+}
+
+
 .router-link-active {
     @apply font-bold underline;
 }
