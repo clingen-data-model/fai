@@ -15,18 +15,18 @@ const loadCodingSystemOptions = async () => {
 export const fields = ref([
     {
         name: 'title',
-        type: 'text'
     },
     {
         name: 'coding_system_id',
         label: 'Coding System',
         type: 'select',
         options: [],
+        required: true,
     },
     {
         name: 'code',
         label: 'Reference Code',
-        type: 'text',
+        required: true,
     }
 ]);
 

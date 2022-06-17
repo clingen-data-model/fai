@@ -3,7 +3,9 @@ import repository from '@/repositories/assay_class_repository.js'
 
 export const fields = [
     {
-        name: 'name'
+        name: 'name',
+        placeholder: 'Western Blot',
+        required: true
     },
     {
         name: 'description',

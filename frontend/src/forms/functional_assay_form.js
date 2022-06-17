@@ -34,7 +34,8 @@ export const fields = ref([
                 showOnOptionsOnFocus: true,
                 multiple: true
             }
-        }
+        },
+        required: true
     },
     { name: 'affiliation_id', type: 'number' },
     { 
@@ -42,24 +43,35 @@ export const fields = ref([
         label: 'Publication',
         type: 'select',
         options: [],
+        required: true
     },
     { name: 'hgnc_id',
         label: 'Gene',
-        placeholder: 'HGNC:1234'
+        placeholder: 'HGNC:1234',
+        required: true
     },
     { name: 'approved', type: 'checkbox' },
     { name: 'material_used', type: 'large-text' },
     { name: 'patient_derived_material_used', type: 'large-text' },
     { name: 'description', type: 'large-text' },
     { name: 'read_out_description', type: 'large-text' },
+    { name: 'range_type', type:'select', options: ['qualitative', 'quantitative'] },
     { name: 'range' },
     { name: 'normal_range' },
     { name: 'abnormal_range'},
     { name: 'indeterminate_range'},
     { name: 'validation_control_pathogenic'},
     { name: 'validation_control_benign'},
-    { name: 'replication', type: 'large-text'},
-    { name: 'statistical_analysis_description', type: 'large-text'},
+    { 
+        name: 'replication', 
+        type: 'large-text', 
+        required: true
+    },
+    { 
+        name: 'statistical_analysis_description', 
+        type: 'large-text', 
+        required: true
+    },
     { name: 'significance_threshold' },
     { name: 'comment', type: 'large-text'},
     { name: 'units' },
@@ -78,4 +90,27 @@ loadPublications()
         fields.value[fields.value.findIndex(f => f.name == 'publication_id')].options = publications
     });
 
-export default (new BaseEntityForm(fields, functionalAssayRepo))
+export class FunctionalAssayForm extends BaseEntityForm
+{
+    constructor () {
+        super(fields, functionalAssayRepo)
+    }
+
+    async save (data) {
+        data = this.prepareDataForStore(data)
+        return super.save(data); 
+    }
+
+    async update(data) {
+        data = this.prepareDataForStore(data)
+        return super.update(data)
+    }
+
+    prepareDataForStore (data) {
+        data.assay_class_ids = data.assay_class_ids ? data.assay_class_ids.map(ac => ac.value) : undefined;
+
+        return data;
+    }
+}
+
+export default (new FunctionalAssayForm())

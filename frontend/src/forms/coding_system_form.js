@@ -4,8 +4,8 @@ import repository from '@/repositories/coding_system_repository.js'
 export const fields = [
     {
         name: 'name',
-        type: 'text',
-        placeholder: 'My coding system'
+        placeholder: 'My coding system',
+        required: true
     },
     {
         name: 'description',
