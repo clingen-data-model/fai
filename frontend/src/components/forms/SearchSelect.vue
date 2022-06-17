@@ -424,7 +424,7 @@ export default {
     .search-select-container .input {
         @apply border-none block w-80;
         display: block;
-        min-width: 2rem;
+        width: 2rem; /* Set the width small b/c this will grow with flex */
         outline: none;
         padding: 0px;
         flex-grow: 1;
