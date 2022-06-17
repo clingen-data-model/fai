@@ -9,11 +9,7 @@
     });
 
     const slots = useSlots();
-    // const attrs = useAttrs();
-
-    // console.log({slots});
-    // console.log({attrs});
-
+    
     const render = () => {
         if (props.items.length > 0) {
             const listItems = props.items.map(item => h('li', null, [slots.default(item)]));
