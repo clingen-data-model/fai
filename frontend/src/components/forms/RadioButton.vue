@@ -1,11 +1,11 @@
 <template>
-    <label class="mb-2">
+    <label class="mb-2 flex space-x-1">
         <slot name="input">
             <input 
                 type="radio"
                 v-model="val" 
                 :id="radioId" 
-                class="mt-1" 
+                class="mt-1 block" 
                 :disabled="$attrs.disabled" 
                 :value="value"
                 >
