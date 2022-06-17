@@ -1,5 +1,5 @@
 import {ref} from 'vue';
-import {api, isValidationError} from '@/http'
+import {isValidationError} from '@/http'
 
 class BaseEntityForm {
     constructor(fields, repository) {
