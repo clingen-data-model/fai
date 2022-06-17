@@ -2,8 +2,12 @@
  * Normalizes the case of a string to lower, space, cased
  * @param {string} string 
  */
-export const normalizeCase = string => {
-    const val = string.replace(/[A-Z]/g, letter => ` ${letter.toLowerCase()}`)
+export const normalizeCase = str => {
+    if (typeof str !== 'string') {
+        console.error('expected string, got '+(typeof str)+' in normalize case.')
+        return str;
+    }
+    const val = str.replace(/[A-Z]/g, letter => ` ${letter.toLowerCase()}`)
             .split(/[\s_-]/)
             .filter(w => w !== ' ' && w !== '')
             .map(w => w.trim())
@@ -31,6 +35,10 @@ export const camelCase = string => {
 }
 
 export const sentenceCase = str => {
+    if (!str) {
+        console.error('expected string, got '+(typeof str)+' in sentence case.')
+        return str
+    }
     return str.charAt(0).toUpperCase()+str.slice(1);
 }
 
