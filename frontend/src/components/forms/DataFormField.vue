@@ -13,6 +13,7 @@
             :class="field.class"
             :errors="errors[field.name]"
             :vertical="field.vertical"
+            :required="field.required"
         >
             <component 
                 :is="field.component.component" 
@@ -31,6 +32,7 @@
             :options="resolveOptions(field)"
             :vertical="field.vertical"
             :class="field.class"
+            :required="field.required"
         ></input-row>
     </div>
 </template>
@@ -79,7 +81,7 @@ export default {
             if (typeof field.label === 'undefined') {
                 return titleCase(field.name);
             }
-            return field.label
+            return  field.label
         },
         resolveOptions (field) {
             if (Array.isArray(field.options)) {

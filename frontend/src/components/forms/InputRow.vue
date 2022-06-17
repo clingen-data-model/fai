@@ -6,8 +6,11 @@
         <div :class="{'sm:flex': !vertical}">
             <div class="flex-none label-container flex-shrink" :class="labelContainerClass" v-show="showLabel">
                 <slot name="label" v-if="hasLabel">
-                    <label :class="resolvedLabelClass">{{label}}{{colon}}</label>
+                    <label :class="resolvedLabelClass">
+                        {{label}}{{colon}}
+                    </label>
                 </slot>
+                <div class="text-xs text-red-800" v-if="required">required</div>
             </div>
             <div class="flex-grow">
                 <slot>
@@ -62,8 +65,11 @@
                         <option value="">Select&hellip;</option>
                         <template v-for="option in options" :key="option.value">
                             <slot name="option-label" v-bind="option">
-                                <option :value="option.value">
-                                    {{option.label || sentenceCase(option.value)}}
+                                <option :value="(typeof option == 'object') ? option.value : option">
+                                    <span v-if="(typeof option == 'object')">
+                                        {{option.label || sentenceCase(option.value)}}
+                                    </span>
+                                    <span v-else>{{option}}</span>
                                 </option>
                             </slot>
                         </template>
@@ -160,6 +166,10 @@ export default {
             type: Boolean,
             default: false
         },
+        required: {
+            type: Boolean,
+            default: false
+        }
     },
     emits: [
         'update:modelValue',
