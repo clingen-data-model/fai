@@ -1,4 +1,5 @@
 import BaseEntityForm from "./base_entity_form"
+import repository from '@/repositories/assay_class_repository.js'
 
 export const fields = [
     {
@@ -11,4 +12,4 @@ export const fields = [
     }
 ]
 
-export default (new BaseEntityForm(fields, '/assay-classes'))
+export default (new BaseEntityForm(fields, repository))

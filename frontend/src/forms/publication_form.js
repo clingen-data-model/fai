@@ -1,6 +1,7 @@
 import {ref} from 'vue'
-import BaseEntityForm from "./base_entity_form";
-import codingSystemRepo from '@/repositories/coding_system_repository'
+import BaseEntityForm from "./base_entity_form.js";
+import codingSystemRepo from '@/repositories/coding_system_repository.js'
+import pubRepo from '@/repositories/publication_repository.js'
 
 const loadCodingSystemOptions = async () => {
     return await codingSystemRepo.query()
@@ -11,28 +12,28 @@ const loadCodingSystemOptions = async () => {
         })
 }
 
-export const fields = ref([]);
+export const fields = ref([
+    {
+        name: 'title',
+        type: 'text'
+    },
+    {
+        name: 'coding_system_id',
+        label: 'Coding System',
+        type: 'select',
+        options: [],
+    },
+    {
+        name: 'code',
+        label: 'Reference Code',
+        type: 'text',
+    }
+]);
 
 loadCodingSystemOptions()
     .then(result => {
-        fields.value = [
-            {
-                name: 'title',
-                type: 'text'
-            },
-            {
-                name: 'coding_system_id',
-                label: 'Coding System',
-                type: 'select',
-                options: result,
-            },
-            {
-                name: 'code',
-                label: 'Reference Code',
-                type: 'text',
-            }
-        ]
-        console.log(fields);
+        const fieldIdx = fields.value.findIndex(f => f.name == 'coding_system_id');
+        fields.value[fieldIdx].options = result
     });
 
-export default (new BaseEntityForm(fields, '/publications'))
+export default (new BaseEntityForm(fields, pubRepo))

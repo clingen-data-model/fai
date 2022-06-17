@@ -1,4 +1,5 @@
 import BaseEntityForm from './base_entity_form'
+import repository from '@/repositories/coding_system_repository.js'
 
 export const fields = [
     {
@@ -12,4 +13,4 @@ export const fields = [
         placeholder: 'This coding system is the best...'
     }
 ]
-export default (new BaseEntityForm(fields, '/coding-systems'));
+export default (new BaseEntityForm(fields, repository));

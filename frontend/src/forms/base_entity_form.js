@@ -2,9 +2,9 @@ import {ref} from 'vue';
 import {api, isValidationError} from '@/http'
 
 class BaseEntityForm {
-    constructor(fields, baseUrl) {
+    constructor(fields, repository) {
         this.fields = fields;
-        this.baseUrl = baseUrl
+        this.repo = repository
         
         this.currentItem = ref({})
         this.originalItem = ref({})
@@ -12,18 +12,18 @@ class BaseEntityForm {
     }
 
      async find (id) {
-        return await api.get(`${this.baseUrl}/${id}`)
-            .then(response => {
-                this.currentItem.value = response.data
-                this.originalItem.value = response.data
-                return response.data
+        const data =  await this.repo.find(id)
+            .then(data => {
+                this.currentItem.value = data
+                this.originalItem.value = data
+                return data
             });
     }
 
      async save (data) {
         this.clearErrors()
         try {
-            await api.post(this.baseUrl, data);
+            await this.repo.save(data)
             this.clearCurrentItem()
         } catch (e) {
             if (isValidationError(e)) {
@@ -36,8 +36,7 @@ class BaseEntityForm {
      async update (data) {
         this.clearErrors()
         try {
-            this.currentItem.value = await api.put(`${this.baseUrl}/${data.id}`, data)
-                .then(response => response.data);
+            this.currentItem.value = this.repo.update(data)
         } catch (e) {
             if (isValidationError(e)) {
                 this.errors.value = e.response.data.errors
