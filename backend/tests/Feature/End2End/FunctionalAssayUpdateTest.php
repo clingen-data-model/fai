@@ -21,14 +21,29 @@ class FunctionalAssayUpdateTest extends TestCase
      */
     public function updates_an_assay_class()
     {
-        $expectedData = $this->getDefaultData();
+        $thirdAssayClass = $this->createAssayClass();
+
+        $data = $expectedData = $this->getDefaultData();
+        $data['assay_class_ids'] = [1,$thirdAssayClass->id];
         unset($expectedData['assay_class_ids']);
 
-        $this->makeRequest()
+        $this->makeRequest($data)
             ->assertStatus(200)
             ->assertJson($expectedData);
 
         $this->assertDatabaseHas('functional_assays',  $this->jsonifyArrays($expectedData));
+        $this->assertDatabaseHas('assay_class_functional_assay', [
+            'functional_assay_id' => $this->functionalAssay->id,
+            'assay_class_id' => 1
+        ]);
+        $this->assertDatabaseHas('assay_class_functional_assay', [
+            'functional_assay_id' => $this->functionalAssay->id,
+            'assay_class_id' => $thirdAssayClass->id
+        ]);
+        $this->assertDatabaseMissing('assay_class_functional_assay', [
+            'functional_assay_id' => $this->functionalAssay->id,
+            'assay_class_id' => 2
+        ]);
     }
 
 

@@ -15,7 +15,10 @@ class FunctionalAssayUpdate
 
     public function handle(FunctionalAssay $functionalAssay, $newData)
     {
+        $assayClassIds = $newData['assay_class_ids'];
         $functionalAssay->update($newData);
+
+        $functionalAssay->assayClasses()->sync($assayClassIds);
 
         event(new FunctionalAssayUpdated($functionalAssay));
         event(new FunctionalAssaySaved($functionalAssay));
