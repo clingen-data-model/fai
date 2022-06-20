@@ -3,13 +3,18 @@
 namespace Tests\Feature\End2End;
 
 use Tests\Feature\End2End\TestCase;
-use Tests\traits\SetsUpFunctionalAssay;
+use App\Events\FunctionalAssaySaved;
 use Illuminate\Testing\TestResponse;
+use Illuminate\Support\Facades\Event;
+use App\Events\FunctionalAssayCreated;
+use Tests\traits\SetsUpFunctionalAssay;
 use Tests\traits\FunctionalAssayTestHelpers;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class FunctionalAssayCreateTest extends TestCase
 {
     use FunctionalAssayTestHelpers;
+    use RefreshDatabase;
 
     public function setup():void
     {
@@ -84,6 +89,36 @@ class FunctionalAssayCreateTest extends TestCase
             'patient_derived_material_used' => 'This must be an array',
             'field_notes' => 'This must be an array.'
         ]);
+    }
+    
+    /**
+     * @test
+     */
+    public function fires_FunctionalAssayCreated_event()
+    {
+        Event::fake();
+
+        $this->makeRequest()
+            ->assertStatus(201);
+
+        Event::assertDispatched(FunctionalAssayCreated::class, function ($event) {
+            return $event->functionalAssay->hgnc_id == 'HGNC:12345';
+        });
+    }
+
+    /**
+     * @test
+     */
+    public function fires_FunctionalAssaySaved_event()
+    {
+        Event::fake();
+
+        $this->makeRequest()
+            ->assertStatus(201);
+
+        Event::assertDispatched(FunctionalAssaySaved::class, function ($event) {
+            return $event->functionalAssay->hgnc_id == 'HGNC:12345';
+        });
     }
     
     

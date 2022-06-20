@@ -4,9 +4,12 @@ namespace Tests\Feature\End2End;
 
 use App\Models\FunctionalAssay;
 use Tests\Feature\End2End\TestCase;
+use App\Events\FunctionalAssaySaved;
 use Illuminate\Testing\TestResponse;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
+use App\Events\FunctionalAssayUpdated;
 use Tests\traits\FunctionalAssayTestHelpers;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class FunctionalAssayUpdateTest extends TestCase
 {
@@ -87,6 +90,33 @@ class FunctionalAssayUpdateTest extends TestCase
             'field_notes' => 'This must be an array.'
         ]);
     }
+
+    /**
+     * @test
+     */
+    public function fires_functionalAssayUpdated_event()
+    {
+        Event::fake();
+
+        $this->makeRequest()
+            ->assertStatus(200);
+
+        Event::assertDispatched(FunctionalAssayUpdated::class);
+    }
+    
+    /**
+     * @test
+     */
+    public function fires_functionalAssaySaved_event()
+    {
+        Event::fake();
+
+        $this->makeRequest()
+            ->assertStatus(200);
+
+        Event::assertDispatched(FunctionalAssaySaved::class);
+    }
+    
 
     private function makeRequest($data = null): TestResponse
     {

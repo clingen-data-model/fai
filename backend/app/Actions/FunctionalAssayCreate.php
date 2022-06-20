@@ -4,7 +4,9 @@ namespace App\Actions;
 use App\Enums\RangeType;
 use App\Models\FunctionalAssay;
 use Illuminate\Validation\Rule;
+use App\Events\FunctionalAssaySaved;
 use Lorisleiva\Actions\ActionRequest;
+use App\Events\FunctionalAssayCreated;
 use Lorisleiva\Actions\Concerns\AsController;
 
 class FunctionalAssayCreate
@@ -18,6 +20,9 @@ class FunctionalAssayCreate
             $funcAssay->assayClasses()
                 ->attach($id);
         }
+        
+        event(new FunctionalAssayCreated($funcAssay));
+        event(new FunctionalAssaySaved($funcAssay));
         
         return $funcAssay;
     }

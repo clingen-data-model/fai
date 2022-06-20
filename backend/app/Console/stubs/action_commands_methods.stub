@@ -1,6 +1,0 @@
-
-
-    function asCommand(Command $command)
-    {
-        //
-    }

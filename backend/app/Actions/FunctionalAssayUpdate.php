@@ -1,9 +1,12 @@
 <?php
 
 namespace App\Actions;
+
 use App\Models\FunctionalAssay;
 use Illuminate\Validation\Rule;
+use App\Events\FunctionalAssaySaved;
 use Lorisleiva\Actions\ActionRequest;
+use App\Events\FunctionalAssayUpdated;
 use Lorisleiva\Actions\Concerns\AsController;
 
 class FunctionalAssayUpdate
@@ -13,6 +16,9 @@ class FunctionalAssayUpdate
     public function handle(FunctionalAssay $functionalAssay, $newData)
     {
         $functionalAssay->update($newData);
+
+        event(new FunctionalAssayUpdated($functionalAssay));
+        event(new FunctionalAssaySaved($functionalAssay));
 
         return $functionalAssay;
     }
