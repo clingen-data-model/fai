@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import App from '@/App.vue'
 import router from '@/router/index.js'
 import '@/assets/app.css'
+import objectUid from '@/object_uid'
 
 const app = createApp(App)
 
@@ -47,7 +48,7 @@ app.mixin({
             sentenceCase
         }
     })
-    // .mixin(objectUid)
+    .mixin(objectUid)
     .mixin({
         mounted () {
             if (this.id) {
