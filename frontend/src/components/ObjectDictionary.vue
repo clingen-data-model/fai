@@ -90,8 +90,9 @@ export default {
             const except = {}
             Object.keys(this.obj)
                 .forEach(key => {
+                    console.log(key);
                     if (!this.except.includes(key)) {
-                        except[key] = this.format(this.obj[key]);
+                        except[key] = this.format(key, this.obj[key]);
                     }
                 })
             return except;
