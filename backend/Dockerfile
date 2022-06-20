@@ -17,7 +17,7 @@ WORKDIR /var/www/html
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
 # PHP configs (including loading phprdkafka)
-COPY .docker/php/conf.d/* $PHP_INI_DIR/conf.d/
+# COPY .docker/php/conf.d/* $PHP_INI_DIR/conf.d/
 
 COPY .docker/start.sh /usr/local/bin/start
 
