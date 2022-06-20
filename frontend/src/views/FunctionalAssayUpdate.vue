@@ -33,6 +33,6 @@
         <template v-slot:header>
             <h1>Edit the Functional Assay</h1>
         </template>
-        <CrudCreate :formDef="formDefinition"></CrudCreate>
+        <CrudUpdate :formDef="formDefinition"></CrudUpdate>
     </ScreenTemplate>
 </template>

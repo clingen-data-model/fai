@@ -21,7 +21,7 @@
             await props.formDef.update(currentItem.value);
             router.go(-1);
         } catch (e) {
-
+            throw e
         }
     }
 

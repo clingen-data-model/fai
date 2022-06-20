@@ -103,6 +103,11 @@ export class FunctionalAssayForm extends BaseEntityForm
         super(fields, functionalAssayRepo)
     }
 
+    async find (id) {
+        await super.find(id);
+        this.currentItem.value = this.prepareLoadedData(this.currentItem.value);
+    }
+
     async save (data) {
         data = this.prepareDataForStore(data)
         return super.save(data); 
@@ -116,6 +121,11 @@ export class FunctionalAssayForm extends BaseEntityForm
     prepareDataForStore (data) {
         data.assay_class_ids = data.assay_class_ids ? data.assay_class_ids.map(ac => ac.value) : undefined;
 
+        return data;
+    }
+
+    prepareLoadedData (data) {
+        data.assay_class_ids = data.assay_classes.map(i => ({value: i.id, label: i.name}));
         return data;
     }
 }

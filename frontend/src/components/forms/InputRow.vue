@@ -1,7 +1,13 @@
+<style scoped>
+    .input-row {
+         @apply my-3
+    }
+</style>
+
 <template>
     <div 
         :class="{'border-l border-red-800 px-2': hasErrors}" 
-        class="input-row my-3"
+        class="input-row"
     >
         <div :class="{'sm:flex': !vertical}">
             <div class="flex-none label-container flex-shrink" :class="labelContainerClass" v-show="showLabel">

@@ -56,6 +56,7 @@
                     :data="items"
                     v-model:sort="sort"
                     @rowClick="goToItem"
+                    rowClass="cursor-pointer"
                 ></DataTable>
             </template>
         </CrudIndex>

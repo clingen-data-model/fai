@@ -71,6 +71,10 @@ export default {
         multiple: {
             type: Boolean,
             default: false
+        },
+        keyOptionsBy: {
+            type: String,
+            default: 'id'
         }
     },
     emits: [
@@ -125,7 +129,10 @@ export default {
             return this.selections.length > 0
         },
         filteredUniqueOptions () {
-            return this.filteredOptions.filter(i => !this.selections.includes(i))
+            const selectionIds = this.selections.map(s => s.value);
+            console.log(this.selections);
+            return this.filteredOptions
+                    .filter(i => !selectionIds.includes(i.value))
         }
     },
     watch: {
@@ -135,7 +142,10 @@ export default {
         filteredOptions: function () {
             this.cursorPosition = 0;
         },
-        modelValue () {
+        modelValue (to) {
+            if (to) {
+                this.selections = to
+            }
             this.clearInput();
             this.resetCursor();
         }
@@ -341,9 +351,12 @@ export default {
 <template>
     <!-- Trying to get v-click-outside to work, but option slot markup doesn't appear to be in complenent $el when running $el.contains() in v-click-outisde directive -->
     <!-- <div class="search-select-component" v-click-outside="{handler: ()=> {}, exclude: []}"> -->
-    <div class="search-select-component relative" >
-        <div class="search-select-container border flex space-x-2">
-            <div class="selection" :class="{disabled: disabled}" v-if="hasSelection" v-for="selection, idx in selections" :key="idx">
+    <div class="search-select-component">
+        <div class="search-select-container bg-white">
+            <div v-if="hasSelection" 
+                v-for="selection, idx in selections" :key="idx"
+                class="selection" :class="{disabled: disabled}"
+            >
                 <label>
                     <slot name="selection-label" :selection="selection">
                         {{selection[labelField]}}
@@ -360,7 +373,7 @@ export default {
                 type="text" 
                 v-model="searchText" 
                 ref="input" 
-                class="input" 
+                class="input"
                 @keydown="handleKeyDown"
                 @keyup="handleKeyEvent"
                 @focus="handleInputFocus"
@@ -396,7 +409,7 @@ export default {
     }
 
     .search-select-container {
-        @apply border border-gray-300 leading-6 px-2 flex items-center flex-wrap py-1 rounded bg-white;
+        @apply border border-gray-300 leading-6 px-2 flex items-center flex-wrap py-1 rounded space-x-2;
     }
 
     .selection {
