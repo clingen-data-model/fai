@@ -1,5 +1,6 @@
 <script setup>
     import { ref } from 'vue'
+    import {useRouter} from 'vue-router'
 
     const tableFields = [
         {
@@ -24,6 +25,16 @@
         desc: false
     })
 
+    const router = useRouter();
+    const goToItem = (item) => {
+        router.push({
+            name: 'FunctionalAssayDetail', 
+            params: {
+                id: item.id
+            }
+        });
+    }
+
 </script>
 
 <template>
@@ -44,6 +55,7 @@
                     :fields="tableFields"
                     :data="items"
                     v-model:sort="sort"
+                    @rowClick="goToItem"
                 ></DataTable>
             </template>
         </CrudIndex>

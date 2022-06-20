@@ -23,6 +23,14 @@ const routes = [
             protected: true
         }
     },
+    { name: 'AssayClassDetail',
+        path: '/assay-classes/:id',
+        component: () => import ('@/views/AssayClassDetail.vue'),
+        meta: {
+            protected: true
+        },
+        props: true
+    },
     { name: 'AssayClassUpdate',
         path: '/assay-classes/:id/edit',
         component: () => import ('@/views/AssayClassUpdate.vue'),
@@ -30,7 +38,6 @@ const routes = [
             protected: true
         },
         props: true
-
     },
     { name: 'AssayClassDelete',
         path: '/assay-classes/:id/delete',
@@ -129,6 +136,24 @@ const routes = [
             protected: true
         },
         props: true
+    },
+    {
+        name: 'FunctionalAssayDetail',
+        path: '/functional-assays/:id',
+        component: () => import('@/views/FunctionalAssayDetail.vue'),
+        metadata: {
+            protected: true
+        },
+        props: true
+    },
+    {
+        name: 'FunctionalAssayEdit',
+        path: '/functional-assays/:id/edit',
+        component: () => import('@/views/FunctionalAssayUpdate.vue'),
+        metadata: {
+            protected: true
+        },
+        props: route => ({ id: parseInt(route.params.id)})
     },
 
     { name: 'StyleGuide',
