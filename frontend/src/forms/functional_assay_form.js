@@ -1,4 +1,5 @@
-import {ref, markRaw} from 'vue'
+import {ref, markRaw, h} from 'vue'
+import {RouterLink} from 'vue-router'
 import BaseEntityForm from "./base_entity_form.js";
 import assayClassRepo from '@/repositories/assay_class_repository.js'
 import pubRepo from '@/repositories/publication_repository.js'
@@ -33,11 +34,17 @@ export const fields = ref([
                 labelField: 'label',
                 showOnOptionsOnFocus: true,
                 multiple: true
+            },
+            slots: {
+                additionalOption: () =>  h(
+                    RouterLink, 
+                    { to: { name: 'AssayClassCreate' }, innerHTML: 'Create new Assay Class' } 
+                )
             }
         },
         required: true
     },
-    { name: 'affiliation_id', type: 'number' },
+    { name: 'affiliation_id', type: 'number'},
     { 
         name: 'publication_id',
         label: 'Publication',
@@ -93,7 +100,6 @@ loadAssayClasses()
 
 loadPublications()
     .then(publications => {
-        console.log(publications)
         fields.value[fields.value.findIndex(f => f.name == 'publication_id')].options = publications
     });
 

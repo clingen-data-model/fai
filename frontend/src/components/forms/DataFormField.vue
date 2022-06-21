@@ -1,50 +1,16 @@
 <template>
-    <div v-if="evalShow(field)">
-        <dictionary-row v-if="field.type == 'dictionary-row'"
-            :label="getFieldLabel(field)"
-            :class="field.class"
-        >
-            {{fieldValue}}
-        </dictionary-row>
-        
-        <input-row 
-            v-else-if="field.type == 'component'" 
-            :label="getFieldLabel(field)"
-            :class="field.class"
-            :errors="errors[field.name]"
-            :vertical="field.vertical"
-            :required="field.required"
-        >
-            <component 
-                :is="field.component.component" 
-                v-bind="field.component.options"
-                v-model="fieldValue" 
-                :errors="errors" 
-            />
-        </input-row>
-
-        <input-row v-else 
-            :label="getFieldLabel(field)" 
-            v-model="fieldValue" 
-            :type="field.type || 'text'"
-            :placeholder="field.placeholder || null"
-            :errors="errors[field.name]"
-            :options="resolveOptions(field)"
-            :vertical="field.vertical"
-            :class="field.class"
-            :required="field.required"
-        ></input-row>
-    </div>
+    <render />
 </template>
-<script>
-import mirror from '@/composables/setup_working_mirror'
-import { titleCase } from '@/utils'
-import {set, get} from 'lodash'
+<script setup>
+    import {computed, h} from 'vue'
+    import {setupMirror, mirrorProps, mirrorEmits} from '@/composables/setup_working_mirror'
+    import { titleCase } from '@/utils'
+    import {set, get} from 'lodash'
+import InputRowVue from './InputRow.vue';
+import DictionaryRowVue from '../DictionaryRow.vue';
 
-export default {
-    name: 'DataFormField',
-    props: {
-        ...mirror.props,
+    const props = defineProps({
+        ...mirrorProps,
         field: {
             type: Object,
             required: true,
@@ -53,60 +19,101 @@ export default {
             type: Object,
             required: true
         },
-    },
-    computed: {
-        fieldValue: {
-            get () {
-                if (this.field.name === '*') {
-                    return this.workingCopy;
-                }
-                const val = get(this.workingCopy, this.field.name);
-                // console.log('get FieldValue: ', this.field.name, val);
-                return val;
-            },
-            set (value) {
-                // console.log('setValue', this.field.name, value)
-                if (this.field.name === '*') {
-                    this.workingCopy = value
-                    return;
-                }
-                if (get(this.workingCopy, this.field.name) !== value) {
-                    set(this.workingCopy, this.field.name, value);
-                }
+    });
+
+    const {workingCopy} = setupMirror(props, {emit});
+
+    const emit = defineEmits(mirrorEmits);
+
+    const fieldValue = computed({
+        get () {
+            if (props.field.name === '*') {
+                return workingCopy.value
+            }
+            const val = get(workingCopy.value, props.field.name);
+            return val;
+        },
+        set (value) {
+            if (props.field.name === '*') {
+                workingCopy.value = value
+                return;
+            }
+            if (get(workingCopy.value, props.field.name) !== value) {
+                set(workingCopy.value, props.field.name, value);
             }
         }
-    },
-    methods: {
-        getFieldLabel (field) {
-            if (typeof field.label === 'undefined') {
-                return titleCase(field.name);
-            }
-            return  field.label
-        },
-        resolveOptions (field) {
-            if (Array.isArray(field.options)) {
-                return field.options
-            }
-            if (typeof field.options == 'function') {
-                return field.options(this.workingCopy);
-            }
-            return [];
-        },
-        evalShow(field) {
-            if (field.show) {
-                return field.show(this.workingCopy);
-            }
-            return true;
-        },
-    },
-    emits: [
-        ...mirror.emits
-    ],
-    setup(props, context) {
-        const {workingCopy} = mirror.setup(props, context);
-        return {
-            workingCopy
+    })
+
+    const getFieldLabel = (field) => {
+        if (typeof field.label === 'undefined') {
+            return titleCase(field.name);
         }
+        return  field.label
     }
-}
+
+    const resolveOptions = (field) => {
+        if (Array.isArray(field.options)) {
+            return field.options
+        }
+        if (typeof field.options == 'function') {
+            return field.options(workingCopy);
+        }
+        return [];
+    }
+
+    const evalShow = (field) => {
+        if (field.show) {
+            return field.show(workingCopy);
+        }
+        return true;
+    }
+
+    const renderChildren = () => {
+        if (props.field.type == 'dictionary-row') {
+            return [h(DictionaryRowVue, null, {innerHTML: fieldValue.value}, {label: getFieldLabel(props.field), class: props.field.class})]
+        }
+        if (props.field.type == 'component') {
+            return [renderComponent()]
+        }
+        return [renderInputRow()];
+    }
+
+    const renderInputRow = (defaultSlotFunction = null) => {
+        const options = {
+            label: getFieldLabel(props.field),
+            modelValue: fieldValue.value ,
+            'onUpdate:modelValue': (value) => { fieldValue.value = value },
+            type: props.field.type || 'text',
+            placeholder: props.field.placeholder || null,
+            errors: props.errors[props.field.name],
+            options: resolveOptions(props.field),
+            vertical: props.field.vertical,
+            class: props.field.class,
+            required: props.field.required,
+        }
+        return h( InputRowVue, options, defaultSlotFunction)
+    }
+
+    const renderComponent = () => {
+        const renderComponent = () => {
+            const options = {
+                ...props.field.component.options,
+                modelValue: fieldValue.value,
+                'onUpdate:modelValue': (value) => { fieldValue.value = value },
+            }
+            
+            return h(props.field.component.component, options,  props.field.component.slots)
+        }
+        return renderInputRow(renderComponent)
+    }
+
+    const render = () => {
+        const children = renderChildren()
+        const container = h('div', null, evalShow(props.field) ? children : []);
+        
+        return container
+    }
+
+
+
 </script>
