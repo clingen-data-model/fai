@@ -6,10 +6,14 @@ import pubRepo from '@/repositories/publication_repository.js'
 import functionalAssayRepo from '@/repositories/functional_assay_repository.js'
 import SearchSelect from '@/components/forms/SearchSelect.vue'
 
+
+const assayClassOptions = ref([]);
+const publicationOptions = ref([]);
+
 const loadAssayClasses = async () => {
     return await assayClassRepo.query()
         .then(assayClasses => {
-            return assayClasses.map(i => {
+            assayClassOptions.value = assayClasses.map(i => {
                 return {value: i.id, label: i.name}
             })
         })
@@ -17,7 +21,7 @@ const loadAssayClasses = async () => {
 const loadPublications = async () => {
     return await pubRepo.query()
         .then(pubs => {
-            return pubs.map(i => {
+            publicationOptions.value = pubs.map(i => {
                 return {value: i.id, label: i.name}
             })
         })
@@ -25,33 +29,46 @@ const loadPublications = async () => {
 
 export const fields = ref([
     { 
+        name: 'publication_id',
+        label: 'Publication',
+        type: 'component',
+        component: {
+            component: markRaw(SearchSelect),
+            options: {
+                options: publicationOptions,
+                labelField: 'label',
+                showOnOptionsOnFocus: true,
+            },
+            slots: {
+                additionalOption: () =>  h(
+                    'a', 
+                    { href: `#create-publication`, innerHTML: 'Create new Publication', class: 'btn xs' } 
+                )
+            }
+        },
+        required: true
+    },
+    { 
         name: 'assay_class_ids', 
         type: 'component', 
         component: {
             component: markRaw(SearchSelect),
             options: {
-                options: [],
+                options: assayClassOptions,
                 labelField: 'label',
                 showOnOptionsOnFocus: true,
                 multiple: true
             },
             slots: {
                 additionalOption: () =>  h(
-                    RouterLink, 
-                    { to: { name: 'AssayClassCreate' }, innerHTML: 'Create new Assay Class' } 
+                    'a', 
+                    { href: `#create-assay-class`, innerHTML: 'Create new Assay Class', class: 'btn xs' } 
                 )
             }
         },
         required: true
     },
     { name: 'affiliation_id', type: 'number'},
-    { 
-        name: 'publication_id',
-        label: 'Publication',
-        type: 'select',
-        options: [],
-        required: true
-    },
     { name: 'hgnc_id',
         label: 'Gene',
         placeholder: 'HGNC:1234',
@@ -93,16 +110,8 @@ export const fields = ref([
     { name: 'assay_notes', type: 'large-text'}
 ]);
 
-loadAssayClasses()
-    .then(assayClasses => {
-        fields.value[fields.value.findIndex(f => f.name == 'assay_class_ids')].component.options.options = assayClasses
-    });
-
+loadAssayClasses();
 loadPublications()
-    .then(publications => {
-        fields.value[fields.value.findIndex(f => f.name == 'publication_id')].options = publications
-    });
-
 export class FunctionalAssayForm extends BaseEntityForm
 {
     constructor () {
@@ -126,14 +135,31 @@ export class FunctionalAssayForm extends BaseEntityForm
 
     prepareDataForStore (data) {
         data.assay_class_ids = data.assay_class_ids ? data.assay_class_ids.map(ac => ac.value) : undefined;
+        data.publication_id =  data.publication_id 
+                                ? data.publication_id.id 
+                                : data.publciation_id;
 
         return data;
     }
 
     prepareLoadedData (data) {
-        data.assay_class_ids = data.assay_classes.map(i => ({value: i.id, label: i.name}));
+        data.assay_class_ids = data.assay_classes 
+                                ? data.assay_classes.map(i => ({value: i.id, label: i.name}))
+                                : data.assay_classes;
+
+        data.publication_id = data.publication
+                                ? {value: data.publication.id, label: data.publication.name}
+                                : null
         return data;
     }
+
+    loadAssayClasses () {
+        loadAssayClasses()    
+    }
+    loadPublications () {
+        loadPublications()    
+    }
+    
 }
 
 export default (new FunctionalAssayForm())
