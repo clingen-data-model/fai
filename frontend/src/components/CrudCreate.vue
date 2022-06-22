@@ -11,19 +11,23 @@
         }
     })
 
+    const emit = defineEmits(['canceled', 'saved']);
+
     const fields = props.formDef.fields
     const currentItem = props.formDef.currentItem
     const errors = props.formDef.errors
 
     const handleSubmission = async () => {
         props.formDef.save(currentItem.value)
-            .then(() => {
+            .then(newItem => {
+                emit('saved', newItem);
                 router.go(-1);
             });
     }
 
     const handleCancel = () => {
         props.formDef.cancel();
+        emit('canceled');
         router.go(-1);
     }
 
