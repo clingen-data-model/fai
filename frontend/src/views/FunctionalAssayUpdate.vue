@@ -1,6 +1,15 @@
 <script setup>
     import {ref, onMounted} from 'vue'
     import formDefinition from '@/forms/functional_assay_form.js'
+    import AssayClassCreateDialog from './AssayClassCreateDialog.vue'
+    import PublicationCreateDialog from './PublicationCreateDialog.vue'
+    import { useRoute, useRouter} from 'vue-router'
+    import routeHash from '@/composables/route_hash.js'
+
+    const route = useRoute();
+    const router = useRouter();
+
+    const {hashData} = routeHash(route, router);
 
     const props = defineProps({
         id: {
@@ -34,5 +43,15 @@
             <h1>Edit the Functional Assay</h1>
         </template>
         <CrudUpdate :formDef="formDefinition"></CrudUpdate>
+        <teleport to='body'> 
+            <AssayClassCreateDialog 
+                @saved="formDefinition.loadAssayClasses()" 
+                v-model="hashData['create-assay-class']"
+             />
+             <PublicationCreateDialog
+                @saved="formDefinition.loadPublications()"
+                v-model="hashData['create-publication']"
+            />
+        </teleport>
     </ScreenTemplate>
 </template>
