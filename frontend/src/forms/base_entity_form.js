@@ -23,8 +23,9 @@ class BaseEntityForm {
      async save (data) {
         this.clearErrors()
         try {
-            await this.repo.save(data)
+            const newItem = await this.repo.save(data)
             this.clearCurrentItem()
+            return newItem;
         } catch (e) {
             if (isValidationError(e)) {
                 this.errors.value = e.response.data.errors
