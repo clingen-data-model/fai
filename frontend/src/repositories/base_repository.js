@@ -1,4 +1,4 @@
-import { api, isValidationError } from '@/http'
+import { api } from '@/http'
 
 export default class BaseRepository {
     constructor (baseUrl, options = {}) {
@@ -7,7 +7,7 @@ export default class BaseRepository {
     }
 
     query () {
-        return api.get(this.baseUrl).then(response => this.transformToEntity(response.data))
+        return api.get(this.baseUrl).then(response =>  this.transformToEntity(response.data))
     }
 
     find (id) {
