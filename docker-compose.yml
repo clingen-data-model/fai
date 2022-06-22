@@ -43,13 +43,13 @@ services:
         depends_on:
             - app
 
-    redis:
-        container_name: func-ev-l-redis
-        image: centos/redis-5-centos7
-        ports:
-            - "6379:6379"
-        environment:
-            - REDIS_PASSWORD="null"
+    # redis:
+    #     container_name: func-ev-l-redis
+    #     image: centos/redis-5-centos7
+    #     ports:
+    #         - "6379:6379"
+    #     environment:
+    #         - REDIS_PASSWORD="null"
     # scheduler:
     #     image: func-ev-l-app
     #     container_name: func-ev-l-scheduler
