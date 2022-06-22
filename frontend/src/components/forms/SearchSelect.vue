@@ -130,7 +130,6 @@ export default {
         },
         filteredUniqueOptions () {
             const selectionIds = this.selections.map(s => s.value);
-            console.log(this.selections);
             return this.filteredOptions
                     .filter(i => !selectionIds.includes(i.value))
         }
