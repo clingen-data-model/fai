@@ -123,7 +123,7 @@ const routes = [
         name: 'FunctionalAssayIndex',
         path: '/functional-assays',
         component: () => import('@/views/FunctionalAssayIndex.vue'),
-        metadata: {
+        meta: {
             protected: true
         },
         props: true
@@ -132,7 +132,7 @@ const routes = [
         name: 'FunctionalAssayCreate',
         path: '/functional-assays/create',
         component: () => import('@/views/FunctionalAssayCreate.vue'),
-        metadata: {
+        meta: {
             protected: true
         },
         props: true
@@ -141,7 +141,7 @@ const routes = [
         name: 'FunctionalAssayDetail',
         path: '/functional-assays/:id',
         component: () => import('@/views/FunctionalAssayDetail.vue'),
-        metadata: {
+        meta: {
             protected: true
         },
         props: true
@@ -150,7 +150,7 @@ const routes = [
         name: 'FunctionalAssayEdit',
         path: '/functional-assays/:id/edit',
         component: () => import('@/views/FunctionalAssayUpdate.vue'),
-        metadata: {
+        meta: {
             protected: true
         },
         props: route => ({ id: parseInt(route.params.id)})
