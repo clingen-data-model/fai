@@ -29,7 +29,7 @@ const routes = [
         meta: {
             protected: true
         },
-        props: true
+        props: route => ({ id: parseInt(route.params.id)})
     },
     { name: 'AssayClassUpdate',
         path: '/assay-classes/:id/edit',
@@ -37,7 +37,7 @@ const routes = [
         meta: {
             protected: true
         },
-        props: true
+        props: route => ({ id: parseInt(route.params.id)})
     },
     { name: 'AssayClassDelete',
         path: '/assay-classes/:id/delete',
@@ -45,7 +45,7 @@ const routes = [
         meta: {
             protected: true
         },
-        props: true
+        props: route => ({ id: parseInt(route.params.id)})
     },
 
     { name: 'CodingSystemIndex',
@@ -73,7 +73,7 @@ const routes = [
             protected: true,
             permissions: ['coding-systems-update']
         },
-        props: true
+        props: route => ({ id: parseInt(route.params.id)})
     },
 
     { name: 'CodingSystemDelete',
@@ -82,7 +82,7 @@ const routes = [
         meta: {
             protected: true
         },
-        props: true
+        props: route => ({ id: parseInt(route.params.id)})
     },
 
     { name: 'PublicationIndex',
@@ -107,7 +107,7 @@ const routes = [
         meta: {
             protected: true,
         },
-        props: true
+        props: route => ({ id: parseInt(route.params.id)})
     },
 
     { name: 'PublicationDelete',
@@ -116,7 +116,7 @@ const routes = [
         meta: {
             protected: true
         },
-        props: true
+        props: route => ({ id: parseInt(route.params.id)})
     },
 
     {
@@ -144,7 +144,7 @@ const routes = [
         meta: {
             protected: true
         },
-        props: true
+        props: route => ({ id: parseInt(route.params.id)})
     },
     {
         name: 'FunctionalAssayEdit',
