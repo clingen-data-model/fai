@@ -18,11 +18,13 @@ class PublicationCreateTest extends TestCase
         $this->makeRequest()
             ->assertStatus(201)
             ->assertJson([
+                'title' => 'test title 1',
                 'coding_system_id' => $this->codingSystem->id,
                 'code' => '12345',
             ]);
 
         $this->assertDatabaseHas('publications', [
+            'title' => 'test title 1',
             'coding_system_id' => $this->codingSystem->id,
             'code' => '12345',
         ]);
@@ -57,6 +59,7 @@ class PublicationCreateTest extends TestCase
     private function makeRequest($data = null): TestResponse
     {
         $data = $data ?? [
+            'title' => 'test title 1',
             'coding_system_id' => $this->codingSystem->id,
             'code' => '12345',
         ];

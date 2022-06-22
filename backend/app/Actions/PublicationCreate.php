@@ -18,7 +18,7 @@ class PublicationCreate
 
     public function asController(ActionRequest $request)
     {
-        return $this->handle($request->only(['coding_system_id', 'code']));
+        return $this->handle($request->validated());
     }
 
     public function rules(ActionRequest $request): array
