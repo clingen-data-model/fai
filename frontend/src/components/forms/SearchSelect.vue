@@ -143,7 +143,7 @@ export default {
         },
         modelValue (to) {
             if (to) {
-                this.selections = to
+                this.selections = Array.isArray(to) ? to : [to]
             }
             this.clearInput();
             this.resetCursor();
@@ -190,13 +190,13 @@ export default {
         },
         setSelection(selection) {
             this.selections.push(selection);
-            console.log(this.selections);
             this.emitModelUpdate();
             this.clearInput();
             this.resetCursor();
             this.$emit('added', this.selection)
         },
         emitModelUpdate () {
+            console.log(this.selections);
             if (this.multiple) {
                 this.$emit('update:modelValue', this.selections);
             } else {
@@ -441,11 +441,12 @@ export default {
         padding: 0px;
         flex-grow: 1;
         flex-shrink: 1;
-        z-index: 5
+        z-index: 5;
     }
 
     .result-container {
         position:relative;
+        z-index: 10;
     }
 
     .option-list {
