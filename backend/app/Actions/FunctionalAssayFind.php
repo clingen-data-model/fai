@@ -11,7 +11,7 @@ class FunctionalAssayFind
 
     public function handle(FunctionalAssay $functionalAssay)
     {
-        $functionalAssay->load('assayClasses');
+        $functionalAssay->load('assayClasses', 'publication');
         return $functionalAssay;
     }
 }

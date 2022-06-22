@@ -20,6 +20,14 @@ class Publication extends Model
     public $casts = [
         'id' => 'integer'
     ];
+
+    public $with = [
+        'codingSystem'
+    ];
+
+    public $appends = [
+        'name'
+    ];
     
     /**
      * Get the codingSystem that owns the Publication
@@ -40,4 +48,18 @@ class Publication extends Model
     {
         return $this->hasMany(FunctionalAssay::class);
     }
+
+    /**
+     * ACCESSORS
+     */
+
+         public function getNameAttribute()
+         {
+             if (isset($this->attributes['title'])) {
+                return $this->attributes['title'];
+             }
+
+             return $this->codingSystem->name.':'.$this->code;
+         }
+     
 }
