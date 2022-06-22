@@ -21,12 +21,12 @@ services:
             - net.ipv4.ip_unprivileged_port_start=0
         depends_on:
             - database
-            - redis
+            # - redis
         ports:
             - "9000:9000"
         links:
             - database:database
-            - redis:redis
+            # - redis:redis
         volumes:
             - ./backend:/srv/app
         environment:
