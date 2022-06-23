@@ -70,7 +70,7 @@ import DictionaryRowVue from '../DictionaryRow.vue';
 
     const renderChildren = () => {
         if (props.field.type == 'dictionary-row') {
-            return [h(DictionaryRowVue, null, {innerHTML: fieldValue.value}, {label: getFieldLabel(props.field), class: props.field.class})]
+            return [h(DictionaryRowVue, {innerHTML: fieldValue.value, label: getFieldLabel(props.field), class: props.field.class})]
         }
         if (props.field.type == 'component') {
             return [renderComponent()]
