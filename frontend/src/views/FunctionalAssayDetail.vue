@@ -56,7 +56,7 @@
         </DictionaryRow>
         <ObjectDictionary 
             :obj="item" 
-            :except="['assay_classes', 'publication', 'publication_id']"
+            :except="['assay_classes', 'publication', 'publication_id', 'field_notes']"
             labelClass="font-bold w-56 mb-2"
         >
             <template v-slot="{label, labelClass, rowValue, key}">
