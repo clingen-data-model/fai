@@ -19,8 +19,6 @@ COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 # PHP configs (including loading phprdkafka)
 COPY ./.docker/php/conf.d/* $PHP_INI_DIR/conf.d/
 
-COPY .docker/start.sh /usr/local/bin/start
-
 COPY ./composer.lock ./composer.json /var/www/html/
 COPY ./database/seeders ./database/seeders
 COPY ./database/factories ./database/factories
@@ -44,6 +42,9 @@ RUN mkdir -p /.config/psysh \
 # Copy the source code.
 COPY . /var/www/html
 
+# Copy the start script
+COPY .docker/start.sh /usr/local/bin/start
+
 # Copy over the build artifacts from the node build container.
 # COPY --from=builder /usr/src/dist ./public
 # COPY --from=builder /usr/src/dist/index.html ./resources/views/app.blade.php
@@ -63,4 +64,4 @@ RUN php artisan storage:link
 USER 1001
 
 # Run the start command.
-# CMD ["/usr/local/bin/start"]
+CMD ["/usr/local/bin/start"]

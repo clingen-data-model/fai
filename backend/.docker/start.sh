@@ -15,7 +15,8 @@ fi
 
 if [ "$role" = "app" ]; then
 
-    # exec apache2-foreground
+    echo "role: app"
+    php-fpm
 
 elif [ "$role" = "queue" ]; then
 
