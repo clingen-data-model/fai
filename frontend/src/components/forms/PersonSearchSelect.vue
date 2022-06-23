@@ -73,7 +73,6 @@ export default {
                     .then(response => {
                         return response.data.data;
                     })
-            console.log(this.options)
             return this.options;
         },
     },

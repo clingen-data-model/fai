@@ -1,9 +1,3 @@
-<style scoped>
-    .input-row {
-         @apply my-3
-    }
-</style>
-
 <template>
     <div 
         :class="{'border-l border-red-800 px-2': hasErrors}" 

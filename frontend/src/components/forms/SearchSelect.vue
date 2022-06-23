@@ -196,7 +196,6 @@ export default {
             this.$emit('added', this.selection)
         },
         emitModelUpdate () {
-            console.log(this.selections);
             if (this.multiple) {
                 this.$emit('update:modelValue', this.selections);
             } else {

@@ -7,7 +7,7 @@ import AssayClassIndex from '@/views/AssayClassIndex.vue'
 <template>
   <div>
     <header id="nav" class="border-b bg-gray-100 print:hidden">
-      <div class="container px-8 mx-auto py-3 flex">
+      <div class="container py-3 flex">
         <div id="main-menu" class="flex space-x-4 flex-grow">
           <div class="inline-block pr-4">
             <router-link to="/" class="black">FuncEvInt</router-link>
@@ -31,7 +31,7 @@ import AssayClassIndex from '@/views/AssayClassIndex.vue'
       </div>
     </header>
 
-    <div class="my-6 container px-8 mx-auto">
+    <div class="my-6 container">
       <div>
         <div>
           <router-view />

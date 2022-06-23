@@ -1,4 +1,4 @@
-<style lang="postcss" scoped>
+<style scoped>
     .dictionary-row {
         @apply my-2;
     }

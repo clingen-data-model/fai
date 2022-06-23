@@ -1,13 +1,10 @@
-<template>
-    <render />
-</template>
 <script setup>
     import {computed, h} from 'vue'
     import {setupMirror, mirrorProps, mirrorEmits} from '@/composables/setup_working_mirror'
     import { titleCase } from '@/utils'
     import {set, get} from 'lodash'
-import InputRowVue from './InputRow.vue';
-import DictionaryRowVue from '../DictionaryRow.vue';
+    import InputRowVue from './InputRow.vue';
+    import DictionaryRowVue from '../DictionaryRow.vue';
 
     const props = defineProps({
         ...mirrorProps,
@@ -75,6 +72,8 @@ import DictionaryRowVue from '../DictionaryRow.vue';
         if (props.field.type == 'component') {
             return [renderComponent()]
         }
+
+
         return [renderInputRow()];
     }
 
@@ -109,7 +108,7 @@ import DictionaryRowVue from '../DictionaryRow.vue';
 
     const render = () => {
         const children = renderChildren()
-        const container = h('div', null, evalShow(props.field) ? children : []);
+        const container = h('div', {class: ''}, evalShow(props.field) ? children : []);
         
         return container
     }
@@ -117,3 +116,7 @@ import DictionaryRowVue from '../DictionaryRow.vue';
 
 
 </script>
+
+<template>
+    <render />
+</template>

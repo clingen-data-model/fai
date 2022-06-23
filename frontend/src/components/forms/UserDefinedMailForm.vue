@@ -58,7 +58,6 @@ export default {
                 return this.modelValue;
             },
             set (value) {
-                console.log('workingEmail.set', value);
                 this.emitEmailUpdate(value);
             }
         },

@@ -1,7 +1,6 @@
 import { computed } from 'vue'
 
 export const parseHashData = (hash) => {
-    console.log('parseHashData')
     const hashString = hash.substr(1);
     if (!hashString) {
         return {};

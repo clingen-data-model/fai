@@ -1,13 +1,18 @@
 <template>
     <div v-if="filteredObj">
-        <dictionary-row 
+        <div
             v-for="(value, key) in filteredObj" 
-            :key="key" 
-            :label="titleCase(key)"
-            :label-class="labelClass"
+            :key="key"
         >
-            {{value}}
-        </dictionary-row>
+            <slot :label="titleCase(key)" :labelClass="labelClass" :rowValue="value" :key="key">
+                <dictionary-row 
+                    :label="titleCase(key)"
+                    :label-class="labelClass"
+                >
+                    {{value}}
+                </dictionary-row>            
+            </slot>
+        </div>
     </div>
 </template>
 <script>

@@ -3,6 +3,15 @@
     <div>
         <h1>Style Guide</h1>
         <hr>
+        <div class="my-4">
+            <div class="dark-bar block sm:hidden md:hidden lg:hidden xl:hidden 2xl:hidden">media: xs</div>
+            <div class="dark-bar hidden sm:block md:hidden lg:hidden xl:hidden 2xl:hidden">media: sm</div>
+            <div class="dark-bar hidden sm:hidden md:block lg:hidden xl:hidden 2xl:hidden">media: md</div>
+            <div class="dark-bar hidden sm:hidden md:hidden lg:block xl:hidden 2xl:hidden">media: lg</div>
+            <div class="dark-bar hidden sm:hidden md:hidden lg:hidden xl:block 2xl:hidden">media: xl</div>
+            <div class="dark-bar hidden sm:hidden md:hidden lg:hidden xl:hidden 2xl:block">media: 2xl</div>
+        </div>
+
         <div class="flex space-x-4">
             <div class="component-group">
                 <h2>Headings</h2>
@@ -53,5 +62,8 @@
 <style scoped>
     .component-group {
         @apply space-y-2 flex-grow
+    }
+    .dark-bar {
+        @apply text-center text-white bg-slate-700  rounded-lg;
     }
 </style>

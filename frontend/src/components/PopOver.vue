@@ -16,3 +16,9 @@ export default {
     }
 }
 </script>
+
+<style>
+    .popper {
+        @apply bg-white border rounded-xl
+    }
+</style>

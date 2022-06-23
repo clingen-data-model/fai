@@ -1,67 +1,73 @@
-<script>
-import DataFormField from '@/components/forms/DataFormField.vue'
-import mirror from '@/composables/setup_working_mirror'
-import {v4 as uuid4} from 'uuid'
+<script setup>
+    import {ref, onBeforeUpdate, h} from 'vue'
+    import DataFormField from '@/components/forms/DataFormField.vue'
+    import mirror from '@/composables/setup_working_mirror'
+    import {v4 as uuid4} from 'uuid'
 
-export default {
-    name: 'DataForm',
-    components: {
-        DataFormField
-    },
-    props: {
-        ...mirror.props,
-        errors: {
-            type: Object,
-            required: false,
-            default: () => ({})
-        },
-        fields: {
-            type: Array,
-            required: true,
-        },
-    },
-    emits: [
-        ...mirror.emits
-    ],
-    data () {
-        return {
-            formId: uuid4(),
-            fieldRefs: []
-        }
-    },
-    methods: {
-        setFieldRef(el) {
-            this.fieldRefs.push(el)
-        },
-        focus () {
-            if (this.fieldRefs.length > 0) {
-                this.fieldRefs[0].focus();
-            }
-        }
-    },
-    beforeUpdate () {
-        this.fieldRefs = [];
-    },
-    setup(props, context) {
-        const {workingCopy} = mirror.setup(props, context);
-        return {
-            workingCopy
+    const props = defineProps({
+            ...mirror.props,
+            errors: {
+                type: Object,
+                required: false,
+                default: () => ({})
+            },
+            fields: {
+                type: Array,
+                required: true,
+            },
+        });
+
+    const emits = defineEmits([...mirror.emits])
+    const formId = uuid4()
+    const fieldRefs = ref([])
+
+    const setFieldRef = (el) => {
+        fieldRefs.value.push(el)
+    }
+
+    const focus = () => {
+        if (fieldRefs.value.length > 0) {
+            fieldRefs.value[0].focus();
         }
     }
-}
+
+    const {workingCopy} = mirror.setup(props, {emit: emits});
+
+    onBeforeUpdate(() => {
+        fieldRefs.value = [];
+    })
+
+    const renderExtra = ({field, modelvalue}) => {
+            let extraSlot = null;
+            if (field.extraSlot) {
+                extraSlot = h(
+                    field.extraSlot, 
+                    {
+                        field: field, 
+                        modelValue: workingCopy.value, 
+                        'onUpdate:modelValue': (value) => {
+                            emits('update:modelValue', value)
+                        }
+                    }
+                )
+            }
+
+        return extraSlot;
+    }
 </script>
 <template>
+    
+    <!-- <render /> -->
     <div class="data-form">
-        <!-- <pre>{{this.farts}}</pre> -->
-        <div v-for="field in fields" :key="field.name">
-            
-            <data-form-field
+        <div v-for="field in fields" :key="field.name" class="sm:flex sm:space-x-2 sm:space-y-2 items-start mt-3 pb-3 border-b">
+            <DataFormField
                 v-model="workingCopy"
                 :field="field"
                 :errors="errors"
                 :ref="setFieldRef"
+                class="flex-grow"
             />
-
+            <renderExtra :field="field" :modelValue="workingCopy" />
         </div>
     </div>
 </template>

@@ -1,10 +1,10 @@
 import {ref, markRaw, h} from 'vue'
-import {RouterLink} from 'vue-router'
 import BaseEntityForm from "./base_entity_form.js";
 import assayClassRepo from '@/repositories/assay_class_repository.js'
 import pubRepo from '@/repositories/publication_repository.js'
 import functionalAssayRepo from '@/repositories/functional_assay_repository.js'
 import SearchSelect from '@/components/forms/SearchSelect.vue'
+import FunctionalAssayFieldNoteInput from '@/components/forms/FunctionalAssayFieldNoteInput.vue'
 
 
 const assayClassOptions = ref([]);
@@ -40,16 +40,16 @@ export const fields = ref([
                 showOnOptionsOnFocus: true,
             },
             slots: {
-                additionalOption: () =>  h(
-                    'a', 
-                    { href: `#create-publication`, innerHTML: 'Create new Publication', class: 'btn xs' } 
-                )
+                additionalOption: () => {
+                    return h('a', { href: `#create-publication`, innerHTML: 'Create new Publication', class: 'btn xs' })
+                } 
             }
         },
-        required: true
+        required: true,
     },
     { 
         name: 'assay_class_ids', 
+        label: 'Assay Classes',
         type: 'component', 
         component: {
             component: markRaw(SearchSelect),
@@ -110,12 +110,17 @@ export const fields = ref([
     { name: 'assay_notes', type: 'large-text'}
 ]);
 
+Object.keys(fields.value).forEach(fieldKey => {
+    fields.value[fieldKey].extraSlot = markRaw(FunctionalAssayFieldNoteInput)
+})
+
 loadAssayClasses();
 loadPublications()
 export class FunctionalAssayForm extends BaseEntityForm
 {
     constructor () {
         super(fields, functionalAssayRepo)
+        this.currentItem.value.field_notes = {}
     }
 
     async find (id) {

@@ -3,6 +3,7 @@ import App from '@/App.vue'
 import router from '@/router/index.js'
 import '@/assets/app.css'
 import objectUid from '@/object_uid'
+import "./assets/popper-theme.css"
 
 const app = createApp(App)
 
