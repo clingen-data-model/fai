@@ -28,7 +28,7 @@ services:
             - database:database
             # - redis:redis
         volumes:
-            - ./backend:/srv/app
+            - ./backend:/var/www/html
         environment:
             CONTAINER_ROLE: app
             CONTAINER_ENV: local
