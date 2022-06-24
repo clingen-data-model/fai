@@ -42,8 +42,6 @@ class FunctionalAssay extends Model
         'affiliation_id' => 'integer',
         'publication_id' => 'integer',
         'approved' => 'boolean',
-        'material_used' => 'array',
-        'patient_derived_material_used' => 'array',
         'field_notes' => 'array'
     ];
     

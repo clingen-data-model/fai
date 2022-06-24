@@ -100,9 +100,9 @@ class FunctionalAssayUpdateTest extends TestCase
             'hgnc_id' => 'The format is invalid.',
             'range_type' => 'The selection is invalid.',
             'approved' => 'This must be true or false.',
-            'material_used' => 'This must be an array.',
-            'patient_derived_material_used' => 'This must be an array',
-            'field_notes' => 'This must be an array.'
+            'field_notes' => 'This must be an array.',
+            'validation_control_pathogenic' => 'This must be an integer.',
+            'validation_control_benign' => 'This must be an integer.',
         ]);
     }
 

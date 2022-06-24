@@ -58,7 +58,7 @@ class FunctionalAssayCreateTest extends TestCase
     /**
      * @test
      */
-    public function validates_paramter_formats()
+    public function validates_parameter_formats()
     {
         $this->makeRequest([
             'affiliation_id' => 'blah',
@@ -80,14 +80,15 @@ class FunctionalAssayCreateTest extends TestCase
             'field_notes' => 'beans'
         ])
         ->assertValidationErrors([
-            'affiliation_id' => 'This must be an integer',
-            'publication_id' => 'The selection is invalid',
+            'affiliation_id' => 'This must be an integer.',
+            'publication_id' => 'The selection is invalid.',
             'hgnc_id' => 'The format is invalid.',
             'range_type' => 'The selection is invalid.',
             'approved' => 'This must be true or false.',
-            'material_used' => 'This must be an array.',
-            'patient_derived_material_used' => 'This must be an array',
-            'field_notes' => 'This must be an array.'
+            'field_notes' => 'This must be an array.',
+            'validation_control_pathogenic' => 'This must be an integer.',
+            'validation_control_benign' => 'This must be an integer.',
+            
         ]);
     }
     
