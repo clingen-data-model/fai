@@ -59,15 +59,17 @@
     
     <!-- <render /> -->
     <div class="data-form">
-        <div v-for="field in fields" :key="field.name" class="sm:flex sm:space-x-2 sm:space-y-2 items-start mt-3 pb-3 border-b">
-            <DataFormField
-                v-model="workingCopy"
-                :field="field"
-                :errors="errors"
-                :ref="setFieldRef"
-                class="flex-grow"
-            />
-            <renderExtra :field="field" :modelValue="workingCopy" />
+        <div v-for="field in fields" :key="field.name">
+            <div class="sm:flex sm:space-x-2 sm:space-y-2 items-start mt-3 pb-3 border-b">
+                <DataFormField
+                    v-model="workingCopy"
+                    :field="field"
+                    :errors="errors"
+                    :ref="setFieldRef"
+                    class="flex-grow"
+                />
+                <renderExtra :field="field" :modelValue="workingCopy" />
+            </div>
         </div>
     </div>
 </template>

@@ -11,20 +11,12 @@ const assayClassOptions = ref([]);
 const publicationOptions = ref([]);
 
 const loadAssayClasses = async () => {
-    return await assayClassRepo.query()
-        .then(assayClasses => {
-            assayClassOptions.value = assayClasses.map(i => {
-                return {value: i.id, label: i.name}
-            })
-        })
+    assayClassOptions.value = await assayClassRepo.query();
+    return assayClassOptions.value;
 }
 const loadPublications = async () => {
-    return await pubRepo.query()
-        .then(pubs => {
-            publicationOptions.value = pubs.map(i => {
-                return {value: i.id, label: i.name}
-            })
-        })
+    publicationOptions.value = await pubRepo.query();
+    return publicationOptions.value;
 }
 
 export const fields = ref([
@@ -36,7 +28,7 @@ export const fields = ref([
             component: markRaw(SearchSelect),
             options: {
                 options: publicationOptions,
-                labelField: 'label',
+                labelField: 'name',
                 showOnOptionsOnFocus: true,
             },
             slots: {
@@ -55,7 +47,7 @@ export const fields = ref([
             component: markRaw(SearchSelect),
             options: {
                 options: assayClassOptions,
-                labelField: 'label',
+                labelField: 'name',
                 showOnOptionsOnFocus: true,
                 multiple: true
             },
@@ -115,7 +107,7 @@ Object.keys(fields.value).forEach(fieldKey => {
 })
 
 loadAssayClasses();
-loadPublications()
+loadPublications();
 export class FunctionalAssayForm extends BaseEntityForm
 {
     constructor () {
@@ -139,23 +131,27 @@ export class FunctionalAssayForm extends BaseEntityForm
     }
 
     prepareDataForStore (data) {
-        data.assay_class_ids = data.assay_class_ids ? data.assay_class_ids.map(ac => ac.value) : undefined;
-        data.publication_id =  data.publication_id 
-                                ? data.publication_id.id 
-                                : data.publciation_id;
-
-        return data;
+        const clone = {...data}
+        clone.assay_class_ids = clone.assay_class_ids ? clone.assay_class_ids.map(ac => ac.id) : undefined;
+        clone.publication_id =  clone.publication_id 
+                                ? clone.publication_id.id 
+                                : clone.publciation_id;
+        return clone;
     }
 
     prepareLoadedData (data) {
-        data.assay_class_ids = data.assay_classes 
-                                ? data.assay_classes.map(i => ({value: i.id, label: i.name}))
-                                : data.assay_classes;
+        const clone = {...data};
+        clone.assay_class_ids = clone.assay_classes
+                                ? clone.assay_classes.map(i => {
+                                    delete(i.pivot);
+                                    return i;
+                                })
+                                : clone.assay_classes;
 
-        data.publication_id = data.publication
-                                ? {value: data.publication.id, label: data.publication.name}
-                                : null
-        return data;
+        clone.publication_id = clone.publication
+                                // ? {value: clone.publication.id, label: clone.publication.name}
+                                // : null
+        return clone;
     }
 
     loadAssayClasses () {
