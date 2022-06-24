@@ -64,7 +64,7 @@ export default {
             type: String,
             default: 'name'
         },
-        showOnOptionsOnFocus: {
+        showOptionsOnFocus: {
             type: Boolean,
             default: false
         },
@@ -151,9 +151,9 @@ export default {
     },
     methods: {
         handleInputFocus () {
-            this.log('handleInputFocus')
+            console.log('handleInputFocus', this.showOptionsOnFocus)
             this.hasFocus = true;
-            if (this.showOnOptionsOnFocus) {
+            if (this.showOptionsOnFocus) {
                 this.search(this.searchText, this.options);
             }
         },
@@ -173,9 +173,15 @@ export default {
                 return [];
             }
 
+            const pattern = new RegExp(searchText, 'gi');
             return options.filter(o => {
-                const match = o[this.labelField].match(new RegExp(searchText, 'gi'));
-                return match !== null
+                let matches = null;
+                if (typeof o == 'string') {
+                    matches = o.match(pattern)
+                } else {
+                    matches = o[this.labelField].match(pattern);
+                }
+                return matches !== null
             })
         },
         removeSelection(selectionIdx){
@@ -307,7 +313,6 @@ export default {
 
         },
         resolveDefaultOptionLabel (option) {
-            this.log('resolveDefaultOptionLabel')
             if (typeof option == 'object') {
                 return option[this.labelField]
             }
@@ -316,7 +321,6 @@ export default {
         },
 
         resolveDefaultSelctionLabel (option) {
-            this.log('resolveDefaultSelectionLabel')
             return this.resolveDefaultOptionLabel(option)
         },
 
@@ -329,7 +333,8 @@ export default {
     created() {
         this.search = debounce( async (searchText, options) => {
             if (searchText == '' || searchText === null || typeof searchText == 'undefined') {
-                if (this.showOnOptionsOnFocus) {
+                if (this.showOptionsOnFocus) {
+                    console.log('show options b/ focus')
                     this.filteredOptions = [...options];
                     return;
                 }
@@ -357,7 +362,7 @@ export default {
             >
                 <label>
                     <slot name="selection-label" :selection="selection">
-                        {{selection[labelField]}}
+                        {{resolveDefaultOptionLabel(selection)}}
                     </slot>
                 </label>  
                 <div 
