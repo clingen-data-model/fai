@@ -57,7 +57,13 @@ class FunctionalAssayUpdate
             'field_notes' => 'nullable|array',
             'assay_notes' => 'nullable',
             'assay_class_ids' => 'filled|array',
-            'assay_class_ids.*' => 'exists:assay_classes,id'
+            'assay_class_ids.*' => 'exists:assay_classes,id',
+            'ep_biological_replicates' => 'nullable',
+            'ep_technical_replicates' => 'nullable',
+            'ep_basic_positive_control' => 'nullable',
+            'ep_basic_negative_control' => 'nullable',
+            'ep_proposed_strength_pathogenic' => 'nullable|max:255',
+            'ep_propsed_strength_benign' => 'nullable|max:255',
          ];
     }
 

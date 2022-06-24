@@ -77,6 +77,8 @@ class FunctionalAssayCreateTest extends TestCase
             'validation_control_benign' => str_repeat("X", 256),
             'significance_threshold' => str_repeat("X", 256),
             'units' => str_repeat('X', 256),
+            'ep_proposed_strength_pathogenic' => str_repeat('X', 256),
+            'ep_propsed_strength_benign' => str_repeat('X', 256),
             'field_notes' => 'beans'
         ])
         ->assertValidationErrors([
@@ -88,6 +90,14 @@ class FunctionalAssayCreateTest extends TestCase
             'field_notes' => 'This must be an array.',
             'validation_control_pathogenic' => 'This must be an integer.',
             'validation_control_benign' => 'This must be an integer.',
+            'range' => 'This must not be greater than 255 characters.',
+            'normal_range' => 'This must not be greater than 255 characters.',
+            'abnormal_range' => 'This must not be greater than 255 characters.',
+            'indeterminate_range' => 'This must not be greater than 255 characters.',
+            'significance_threshold' => 'This must not be greater than 255 characters.',
+            'units' => 'This must not be greater than 255 characters.',
+            'ep_proposed_strength_pathogenic' => 'This must not be greater than 255 characters.',
+            'ep_propsed_strength_benign' => 'This must not be greater than 255 characters.',
             
         ]);
     }

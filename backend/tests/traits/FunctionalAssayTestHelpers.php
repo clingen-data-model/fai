@@ -39,7 +39,6 @@ trait FunctionalAssayTestHelpers
             'material_used' => 'a b c d',
             'patient_derived_material_used' => 'a1 b1 c1',
             'description' => 'This is a description',
-            //  => additional_document: Optional[List[str]] = None
             'read_out_description' => 'read out description',
             'range' => 'a to g',
             'normal_range' => 'a - c',
@@ -55,7 +54,13 @@ trait FunctionalAssayTestHelpers
             'units' => 'units',
             'field_notes' => ["notes" => "test"],
             'assay_notes' =>'assay_notes',
-            'assay_class_ids' => [1, 2]
+            'assay_class_ids' => [1, 2],
+            'ep_biological_replicates' => 'some text',
+            'ep_technical_replicates' => 'some text',
+            'ep_basic_positive_control' => 'some text',
+            'ep_basic_negative_control' => 'some text',
+            'ep_proposed_strength_pathogenic' => 'some text',
+            'ep_propsed_strength_benign' => 'some text',
         ];
     }
     

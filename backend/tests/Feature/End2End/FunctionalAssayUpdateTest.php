@@ -88,8 +88,8 @@ class FunctionalAssayUpdateTest extends TestCase
             'normal_range' => str_repeat("X", 256),
             'abnormal_range' => str_repeat("X", 256),
             'indeterminate_range' => str_repeat("X", 256),
-            'validation_control_pathogenic' => str_repeat("X", 256),
-            'validation_control_benign' => str_repeat("X", 256),
+            'validation_control_pathogenic' => 'test',
+            'validation_control_benign' => 'test',
             'significance_threshold' => str_repeat("X", 256),
             'units' => str_repeat('X', 256),
             'field_notes' => 'beans'

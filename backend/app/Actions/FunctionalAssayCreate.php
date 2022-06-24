@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Actions;
-use App\Enums\RangeType;
 use App\Models\FunctionalAssay;
 use Illuminate\Validation\Rule;
 use App\Events\FunctionalAssaySaved;
@@ -30,6 +29,7 @@ class FunctionalAssayCreate
     public function asController(ActionRequest $request)
     {
         $funcAssayData = $request->safe()->except('assay_class_ids');
+
         $assayClassIds = $request->safe()->only('assay_class_ids');
         $functionalAssay = $this->handle($funcAssayData, $assayClassIds);
         $functionalAssay->load('assayClasses');
@@ -39,7 +39,6 @@ class FunctionalAssayCreate
 
     public function rules(ActionRequest $request): array
     {
-
         return [
             'affiliation_id' => 'required|int',
             'publication_id' => 'required|int|exists:publications,id',
@@ -64,7 +63,13 @@ class FunctionalAssayCreate
             'field_notes' => 'nullable|array',
             'assay_notes' => 'nullable',
             'assay_class_ids' => 'required|array',
-            'assay_class_ids.*' => 'exists:assay_classes,id'
+            'assay_class_ids.*' => 'exists:assay_classes,id',
+            'ep_biological_replicates' => 'nullable',
+            'ep_technical_replicates' => 'nullable',
+            'ep_basic_positive_control' => 'nullable',
+            'ep_basic_negative_control' => 'nullable',
+            'ep_proposed_strength_pathogenic' => 'nullable|max:255',
+            'ep_propsed_strength_benign' => 'nullable|max:255',
         ];
     }
 

@@ -35,7 +35,13 @@ class FunctionalAssay extends Model
         'range_type',
         'units',
         'field_notes',
-        'assay_notes'
+        'assay_notes',
+        'ep_biological_replicates',
+        'ep_technical_replicates',
+        'ep_basic_positive_control',
+        'ep_basic_negative_control',
+        'ep_proposed_strength_pathogenic',
+        'ep_propsed_strength_benign',
     ];
 
     public $casts = [
