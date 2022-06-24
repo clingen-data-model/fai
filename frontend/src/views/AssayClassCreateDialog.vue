@@ -15,7 +15,7 @@
         if (!faForm.currentItem.value.assay_class_ids) {
             faForm.currentItem.value.assay_class_ids = [];
         }
-       faForm. currentItem.value.assay_class_ids.push({label: newAssayClass.name, value: newAssayClass.id})
+       faForm. currentItem.value.assay_class_ids.push(newAssayClass)
         emit('saved', newAssayClass)
     }
 

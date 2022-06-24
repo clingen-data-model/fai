@@ -78,7 +78,7 @@ export const fields = ref([
     { name: 'patient_derived_material_used', type: 'large-text' },
     { name: 'description', type: 'large-text' },
     { name: 'read_out_description', type: 'large-text' },
-    { name: 'range_type', type:'select', options: ['qualitative', 'quantitative'] },
+    { name: 'range_type', type:'select', options: ['qualitative', 'quantitative'], required: true },
     { name: 'range' },
     { name: 'normal_range' },
     { name: 'abnormal_range'},

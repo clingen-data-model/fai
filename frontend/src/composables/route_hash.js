@@ -38,7 +38,7 @@ export default function (route, router) {
     return {
         hashData,
         clearHash: () => {
-            router.push({name: route.name, hash: null})
+            router.replace({name: route.name, hash: null})
         },
         removeFromHash: (removeKey) => {
             const newHashData = {}
@@ -48,13 +48,13 @@ export default function (route, router) {
                 }
             })
 
-            router.push({name: route.name, hash: stringifyHashData(newHashData)});
+            router.replace({name: route.name, hash: stringifyHashData(newHashData)});
         },
         addToHash: (key, value = true) => {
             const temp = hashData.value;
             temp[key] = value;
 
-            router.push({name: route.name, hash: stringifyHashData(temp)})
+            router.replace({name: route.name, hash: stringifyHashData(temp)})
         }
     }
 }

@@ -13,7 +13,7 @@
     const {removeFromHash} = routeHash(route, router);
 
     const handleNewPublication = (newPublication) => {
-        faForm.currentItem.value.publication_id = {value: newPublication.id, label: newPublication.name}
+        faForm.currentItem.value.publication_id = newPublication
         faForm.loadPublications();
         emit('saved', newPublication)
     }
