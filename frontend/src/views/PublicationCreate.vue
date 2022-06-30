@@ -1,5 +1,5 @@
 <script setup>
-    import assayClassForm from '@/forms/publication_form.js'
+    import formDefinition from '@/forms/publication_form.js'
 
     const breadcrumbs = [
         {
@@ -14,6 +14,6 @@
         <template v-slot:header>
             <h1>Add a New Publication</h1>
         </template>
-        <CrudCreate :formDef="assayClassForm"></CrudCreate>
+        <CrudCreate :formDef="formDefinition"></CrudCreate>
     </ScreenTemplate>
 </template>

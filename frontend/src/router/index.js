@@ -159,7 +159,11 @@ const routes = [
     { name: 'StyleGuide',
         path: '/dev/style-guide',
         component: () => import('@/views/dev/StyleGuide.vue'),
-    }
+    },
+    { name: 'FormExample',
+        path: '/dev/form-example',
+        component: () => import('@/views/dev/FormDefExample.vue'),
+    },
 ];
 
 

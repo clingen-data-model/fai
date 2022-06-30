@@ -25,6 +25,10 @@ import AssayClassIndex from '@/views/AssayClassIndex.vue'
                 to="/dev/style-guide" 
                 class="black block " 
               >Style Guide</router-link> 
+              <router-link 
+                to="/dev/form-example" 
+                class="black block " 
+              >Form Example</router-link> 
             </DropdownItem>
           </DropdownMenu>
         </div>

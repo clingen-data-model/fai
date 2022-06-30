@@ -15,6 +15,10 @@
                 type: Array,
                 required: true,
             },
+            wrapperClass: {
+                type: String || null,
+                default: null
+            }
         });
 
     const emits = defineEmits([...mirror.emits])
@@ -37,6 +41,29 @@
         fieldRefs.value = [];
     })
 
+    const renderElement = ({field, modelValue}) => {
+        if (field.type == 'raw-component') {
+            return h(
+                field.component.component, 
+                field.component.options, 
+                field.component.slots
+            );
+        }
+        return h(
+            DataFormField, 
+            {
+                field: field, 
+                modelValue: workingCopy.value, 
+                'onUpdate:modelValue': (value) => {
+                    emits('update:modelValue', value)
+                },
+                ref: setFieldRef(),
+                class: 'flex-grow',
+                errors: props.errors,
+            },
+         )
+    }
+
     const renderExtra = ({field, modelvalue}) => {
             let extraSlot = null;
             if (field.extraSlot) {
@@ -51,23 +78,17 @@
                     }
                 )
             }
-
         return extraSlot;
     }
+    
 </script>
 <template>
     
     <!-- <render /> -->
     <div class="data-form">
         <div v-for="field in fields" :key="field.name">
-            <div class="sm:flex sm:space-x-2 sm:space-y-2 items-start mt-3 pb-3 border-b">
-                <DataFormField
-                    v-model="workingCopy"
-                    :field="field"
-                    :errors="errors"
-                    :ref="setFieldRef"
-                    class="flex-grow"
-                />
+            <div :class="wrapperClass">
+                <renderElement :field="field" :modelValue="workingCopy" />
                 <renderExtra :field="field" :modelValue="workingCopy" />
             </div>
         </div>

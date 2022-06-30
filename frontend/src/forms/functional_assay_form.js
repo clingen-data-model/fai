@@ -29,7 +29,7 @@ export const fields = ref([
             options: {
                 options: publicationOptions,
                 labelField: 'name',
-                showOnOptionsOnFocus: true,
+                showOptionsOnFocus: true,
             },
             slots: {
                 additionalOption: () => {
@@ -48,7 +48,7 @@ export const fields = ref([
             options: {
                 options: assayClassOptions,
                 labelField: 'name',
-                showOnOptionsOnFocus: true,
+                showOptionsOnFocus: true,
                 multiple: true
             },
             slots: {
