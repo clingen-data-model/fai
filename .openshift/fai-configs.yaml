@@ -1,0 +1,725 @@
+{
+    "kind": "List",
+    "apiVersion": "v1",
+    "metadata": {},
+    "items": [
+        {
+            "apiVersion": "v1",
+            "kind": "Secret",
+            "metadata": {
+                "name": "fai-mysql"
+            },
+            "stringData": {
+                "DB_PASSWORD": "2YMTUDFI",
+                "DB_ROOT_PASSWORD": "SK8RV4V5XQKX",
+                "DB_USER": "fai"
+            },
+            "type": "Opaque"
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "PersistentVolumeClaim",
+            "metadata": {
+                "finalizers": [
+                    "kubernetes.io/pvc-protection"
+                ],
+                "name": "fai-mysql-storage"
+            },
+            "spec": {
+                "accessModes": [
+                    "ReadWriteOnce",
+                    "ReadWriteMany"
+                ],
+                "resources": {
+                    "requests": {
+                        "storage": "2Gi"
+                    }
+                },
+                "storageClassName": "snap",
+                "volumeMode": "Filesystem"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "PersistentVolumeClaim",
+            "metadata": {
+                "finalizers": [
+                    "kubernetes.io/pvc-protection"
+                ],
+                "name": "fai-mysql-backups"
+            },
+            "spec": {
+                "accessModes": [
+                    "ReadWriteOnce",
+                    "ReadWriteMany"
+                ],
+                "resources": {
+                    "requests": {
+                        "storage": "2Gi"
+                    }
+                },
+                "storageClassName": "snap",
+                "volumeMode": "Filesystem"
+            }
+        },
+        {
+            "apiVersion": "apps.openshift.io/v1",
+            "kind": "DeploymentConfig",
+            "metadata": {
+                "name": "fai-mysql"
+            },
+            "spec": {
+                "replicas": 1,
+                "revisionHistoryLimit": 5,
+                "selector": {
+                    "app": "mysql",
+                    "deploymentconfig": "mysql"
+                },
+                "strategy": {
+                    "activeDeadlineSeconds": 21600,
+                    "resources": {},
+                    "rollingParams": {
+                        "intervalSeconds": 1,
+                        "maxSurge": "25%",
+                        "maxUnavailable": "25%",
+                        "timeoutSeconds": 600,
+                        "updatePeriodSeconds": 1
+                    },
+                    "type": "Rolling"
+                },
+                "template": {
+                    "metadata": {
+                        "annotations": {
+                            "openshift.io/generated-by": "OpenShiftWebConsole"
+                        },
+                        "creationTimestamp": null,
+                        "labels": {
+                            "app": "mysql",
+                            "deploymentconfig": "mysql"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "env": [
+                                    {
+                                        "name": "MYSQL_PASSWORD",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "key": "DB_PASSWORD",
+                                                "name": "fai-mysql"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "MYSQL_USER",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "key": "DB_USER",
+                                                "name": "fai-mysql"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "MYSQL_ROOT_PASSWORD",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "key": "DB_ROOT_PASSWORD",
+                                                "name": "fai-mysql"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "MYSQL_DATABASE",
+                                        "value": "fai"
+                                    },
+                                    {
+                                        "name": "BACKUP_PATH",
+                                        "value": "/backups"
+                                    }
+                                ],
+                                "image": "docker.io/jward3/openshift-mysql@sha256:1501eaaef8ee4c54fc696e407ddf5f9a0c3c0911696d350192913ff38f37b479",
+                                "imagePullPolicy": "IfNotPresent",
+                                "name": "mysql",
+                                "ports": [
+                                    {
+                                        "containerPort": 3306,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "resources": {},
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File",
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/var/lib/mysql/data",
+                                        "name": "fai-mysql-storage"
+                                    },
+                                    {
+                                        "mountPath": "/backups",
+                                        "name": "fai-mysql-backups",
+                                        "subPath": "epam_backups"
+                                    }
+                                ]
+                            }
+                        ],
+                        "dnsPolicy": "ClusterFirst",
+                        "restartPolicy": "Always",
+                        "schedulerName": "default-scheduler",
+                        "securityContext": {},
+                        "terminationGracePeriodSeconds": 30,
+                        "volumes": [
+                            {
+                                "name": "fai-mysql-storage",
+                                "persistentVolumeClaim": {
+                                    "claimName": "fai-mysql-storage"
+                                }
+                            },
+                            {
+                                "name": "fai-mysql-backups",
+                                "persistentVolumeClaim": {
+                                    "claimName": "fai-mysql-backups"
+                                }
+                            }
+                        ]
+                    }
+                },
+                "test": false,
+                "triggers": [
+                    {
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "mysql"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "name": "openshift-mysql:latest",
+                                "namespace": "dept-gpm"
+                            },
+                            "lastTriggeredImage": "docker.io/jward3/openshift-mysql@sha256:1501eaaef8ee4c54fc696e407ddf5f9a0c3c0911696d350192913ff38f37b479"
+                        },
+                        "type": "ImageChange"
+                    },
+                    {
+                        "type": "ConfigChange"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "dataString": {
+                "REDIS_PASSWORD": "WID6FNQ3IX6P"
+            },
+            "kind": "Secret",
+            "metadata": {
+                "name": "fai-redis"
+            },
+            "type": "Opaque"
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "PersistentVolumeClaim",
+            "metadata": {
+                "finalizers": [
+                    "kubernetes.io/pvc-protection"
+                ],
+                "name": "fai-redis-storage"
+            },
+            "spec": {
+                "accessModes": [
+                    "ReadWriteOnce"
+                ],
+                "resources": {
+                    "requests": {
+                        "storage": "1Gi"
+                    }
+                },
+                "storageClassName": "snap",
+                "volumeMode": "Filesystem"
+            }
+        },
+        {
+            "apiVersion": "apps.openshift.io/v1",
+            "kind": "DeploymentConfig",
+            "metadata": {
+                "labels": {
+                    "app": "fai-redis"
+                },
+                "name": "fai-redis"
+            },
+            "spec": {
+                "replicas": 1,
+                "revisionHistoryLimit": 10,
+                "selector": {
+                    "app": "fai-redis",
+                    "deploymentconfig": "fai-redis"
+                },
+                "strategy": {
+                    "activeDeadlineSeconds": 21600,
+                    "resources": {},
+                    "rollingParams": {
+                        "intervalSeconds": 1,
+                        "maxSurge": "25%",
+                        "maxUnavailable": "25%",
+                        "timeoutSeconds": 600,
+                        "updatePeriodSeconds": 1
+                    },
+                    "type": "Rolling"
+                },
+                "template": {
+                    "metadata": {
+                        "labels": {
+                            "app": "fai-redis",
+                            "deploymentconfig": "fai-redis"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "env": null,
+                                "envFrom": [
+                                    {
+                                        "secretRef": {
+                                            "name": "fai-redis"
+                                        }
+                                    }
+                                ],
+                                "image": "centos/redis-5-centos7@sha256:3bf9417376fa7b1100afe5194d41659945be2b7efedced325b8c60042f2cfa23",
+                                "imagePullPolicy": "Always",
+                                "name": "fai-redis",
+                                "ports": [
+                                    {
+                                        "containerPort": 6379,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "resources": {},
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File",
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/var/lib/redis/data",
+                                        "name": "fai-redis-storage"
+                                    }
+                                ]
+                            }
+                        ],
+                        "dnsPolicy": "ClusterFirst",
+                        "restartPolicy": "Always",
+                        "schedulerName": "default-scheduler",
+                        "securityContext": {},
+                        "terminationGracePeriodSeconds": 30,
+                        "volumes": [
+                            {
+                                "emptyDir": {},
+                                "name": "fai-redis-storage"
+                            }
+                        ]
+                    }
+                },
+                "test": false,
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "redis"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "name": "redis:latest"
+                            },
+                            "lastTriggeredImage": "centos/redis-5-centos7@sha256:3bf9417376fa7b1100afe5194d41659945be2b7efedced325b8c60042f2cfa23"
+                        },
+                        "type": "ImageChange"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "dataString": {
+                "APP_KEY": "base64:0lD0yGZPOaiPcG8Rfx/6s3Uaedidss0oAsMx6V53ths="
+            },
+            "kind": "Secret",
+            "metadata": {
+                "name": "fai-app-key"
+            },
+            "type": "Opaque"
+        },
+        {
+            "apiVersion": "v1",
+            "data": {
+                "APP_DEBUG": "true",
+                "APP_ENV": "demo",
+                "APP_NAME": "fai",
+                "APP_URL": "fai-dept-gene-lookup.apps.cloudapp.unc.edu",
+                "BROADCAST_DRIVER": "log",
+                "CACHE_DRIVER": "redis",
+                "DB_CONNECTION": "mysql",
+                "DB_DATABASE": "fai",
+                "DB_HOST": "fai-mysql",
+                "DB_PORT": "3306",
+                "LOG_CHANNEL": "stack",
+                "LOG_LEVEL": "debug",
+                "MAIL_ENCRYPTION": "null",
+                "MAIL_FROM_ADDRESS": "jward3@email.unc.edu",
+                "MAIL_FROM_NAME": "TJ Ward",
+                "MAIL_HOST": "relay.unc.edu",
+                "MAIL_MAILER": "log",
+                "MAIL_PASSWORD": "null",
+                "MAIL_PORT": "25",
+                "MAIL_USERNAME": "null",
+                "QUEUE_CONNECTION": "redis",
+                "REDIS_HOST": "redis",
+                "REDIS_PORT": "6379",
+                "SANCTUM_STATEFUL_DOMAINS": "fai-dept-gene-lookup.apps.cloudapp.unc.edu",
+                "SESSION_DRIVER": "redis",
+                "SESSION_LIFETIME": "120",
+                "URL_SCHEME": "${urlScheme}"
+            },
+            "kind": "ConfigMap",
+            "metadata": {
+                "name": "fai-backend-config"
+            }
+        },
+        {
+            "apiVersion": "image.openshift.io/v1",
+            "kind": "ImageStream",
+            "metadata": {
+                "labels": {
+                    "app": "fai-backend",
+                    "app.kubernetes.io/component": "fai-backend",
+                    "app.kubernetes.io/instance": "fai-backend"
+                },
+                "name": "fai-backend"
+            },
+            "spec": {
+                "lookupPolicy": {
+                    "local": false
+                }
+            }
+        },
+        {
+            "apiVersion": "build.openshift.io/v1",
+            "kind": "BuildConfig",
+            "metadata": {
+                "labels": {
+                    "app": "fai-backend",
+                    "app.kubernetes.io/component": "fai-backend",
+                    "app.kubernetes.io/instance": "fai-backend"
+                },
+                "name": "fai-backend"
+            },
+            "spec": {
+                "failedBuildsHistoryLimit": 5,
+                "nodeSelector": null,
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "fai-backend:latest"
+                    }
+                },
+                "postCommit": {},
+                "resources": {},
+                "runPolicy": "Serial",
+                "source": {
+                    "contextDir": "backend",
+                    "git": {
+                        "ref": "master",
+                        "uri": "https://github.com/clingen-data-model/fai"
+                    },
+                    "type": "Git"
+                },
+                "strategy": {
+                    "dockerStrategy": {
+                        "from": {
+                            "kind": "ImageStreamTag",
+                            "name": "php:8.1-fpm"
+                        }
+                    },
+                    "type": "Docker"
+                },
+                "successfulBuildsHistoryLimit": 5,
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "imageChange": {},
+                        "type": "ImageChange"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "apps/v1",
+            "kind": "Deployment",
+            "metadata": {
+                "labels": {
+                    "app": "fai",
+                    "app.kubernetes.io/component": "fai",
+                    "app.kubernetes.io/instance": "fai",
+                    "app.kubernetes.io/part-of": "fai"
+                },
+                "name": "fai"
+            },
+            "spec": {
+                "progressDeadlineSeconds": 600,
+                "replicas": 2,
+                "revisionHistoryLimit": 10,
+                "selector": {
+                    "matchLabels": {
+                        "deployment": "fai-backend"
+                    }
+                },
+                "strategy": {
+                    "rollingUpdate": {
+                        "maxSurge": "25%",
+                        "maxUnavailable": "25%"
+                    },
+                    "type": "RollingUpdate"
+                },
+                "template": {
+                    "metadata": {
+                        "labels": {
+                            "deployment": "fai-backend"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "env": [
+                                    {
+                                        "name": "CONTAINER_ROLE",
+                                        "value": "backend"
+                                    }
+                                ],
+                                "envFrom": [
+                                    {
+                                        "secretRef": {
+                                            "name": "fai-mysql"
+                                        }
+                                    },
+                                    {
+                                        "secretRef": {
+                                            "name": "fai-app-key"
+                                        }
+                                    },
+                                    {
+                                        "configMapRef": {
+                                            "name": "fai-backend-config"
+                                        }
+                                    }
+                                ],
+                                "image": "image-registry.openshift-image-registry.svc:5000/dept-gene-lookup/fai-backend",
+                                "imagePullPolicy": "IfNotPresent",
+                                "name": "fai-backend",
+                                "ports": [
+                                    {
+                                        "containerPort": 9000,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "resources": {},
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File",
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/srv/app/storage",
+                                        "name": "backups",
+                                        "subPath": "app"
+                                    }
+                                ]
+                            }
+                        ],
+                        "dnsPolicy": "ClusterFirst",
+                        "restartPolicy": "Always",
+                        "schedulerName": "value-scheduler",
+                        "securityContext": {},
+                        "terminationGracePeriodSeconds": 30,
+                        "volumes": [
+                            {
+                                "name": "backups",
+                                "persistentVolumeClaim": {
+                                    "claimName": "fai-mysql-backups"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "image.openshift.io/v1",
+            "kind": "ImageStream",
+            "metadata": {
+                "labels": {
+                    "app": "fai-frontend",
+                    "app.kubernetes.io/component": "fai-frontend",
+                    "app.kubernetes.io/instance": "fai-frontend"
+                },
+                "name": "fai-frontend"
+            },
+            "spec": {
+                "lookupPolicy": {
+                    "local": false
+                }
+            }
+        },
+        {
+            "apiVersion": "build.openshift.io/v1",
+            "kind": "BuildConfig",
+            "metadata": {
+                "labels": {
+                    "app": "fai-frontend",
+                    "app.kubernetes.io/component": "fai-frontend",
+                    "app.kubernetes.io/instance": "fai-frontend"
+                },
+                "name": "fai-frontend"
+            },
+            "spec": {
+                "failedBuildsHistoryLimit": 5,
+                "nodeSelector": null,
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "fai-frontend:latest"
+                    }
+                },
+                "postCommit": {},
+                "resources": {},
+                "runPolicy": "Serial",
+                "source": {
+                    "contextDir": "frontend",
+                    "git": {
+                        "ref": "master",
+                        "uri": "https://github.com/clingen-data-model/fai"
+                    },
+                    "type": "Git"
+                },
+                "strategy": {
+                    "type": "Docker"
+                },
+                "successfulBuildsHistoryLimit": 5,
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "imageChange": {},
+                        "type": "ImageChange"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "apps/v1",
+            "kind": "Deployment",
+            "metadata": {
+                "labels": {
+                    "app": "fai",
+                    "app.kubernetes.io/component": "fai",
+                    "app.kubernetes.io/instance": "fai",
+                    "app.kubernetes.io/part-of": "fai"
+                },
+                "name": "fai-frontend"
+            },
+            "spec": {
+                "progressDeadlineSeconds": 600,
+                "replicas": 1,
+                "revisionHistoryLimit": 10,
+                "selector": {
+                    "matchLabels": {
+                        "deployment": "fai-frontend"
+                    }
+                },
+                "strategy": {
+                    "rollingUpdate": {
+                        "maxSurge": "25%",
+                        "maxUnavailable": "25%"
+                    },
+                    "type": "RollingUpdate"
+                },
+                "template": {
+                    "metadata": {
+                        "labels": {
+                            "deployment": "fai-frontend"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "env": [
+                                    {
+                                        "name": "CONTAINER_ROLE",
+                                        "value": "frontend"
+                                    }
+                                ],
+                                "image": "image-registry.openshift-image-registry.svc:5000/dept-gene-lookup/fai-frontend",
+                                "imagePullPolicy": "IfNotPresent",
+                                "name": "fai-frontend",
+                                "ports": [
+                                    {
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "resources": {},
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File"
+                            }
+                        ],
+                        "dnsPolicy": "ClusterFirst",
+                        "restartPolicy": "Always",
+                        "schedulerName": "value-scheduler",
+                        "securityContext": {},
+                        "terminationGracePeriodSeconds": 30
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Service",
+            "metadata": {
+                "annortation": "Exposes and load balances the webserver",
+                "name": "fai-frontend"
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "web",
+                        "port": 8080,
+                        "targetPort": 8080
+                    }
+                ],
+                "selector": {
+                    "name": "fai-frontend"
+                }
+            }
+        },
+        {
+            "apiVersion": "route.openshift.io/v1",
+            "kind": "Route",
+            "metadata": {
+                "annotations": {
+                    "template.openshift.io/expose-uri": "http://{.spec.host}{.spec.path}"
+                },
+                "name": "fai-frontend"
+            },
+            "spec": {
+                "host": "fai-dept-gene-lookup.apps.cloudapp.unc.edu",
+                "to": {
+                    "kind": "Service",
+                    "name": "fai-frontend"
+                }
+            }
+        }
+    ]
+}

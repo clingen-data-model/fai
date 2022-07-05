@@ -1,0 +1,179 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: mysql-template
+  annotations:
+    description: "Creates Secrets and MySQL deploymentconfig and service."
+    iconClass: "icon-mysql"
+    tags: "database,sql"
+
+objects:
+# MYSQL Secret
+- apiVersion: v1
+  kind: Secret
+  type: Opaque
+  metadata:
+    name: ${appName}-mysql
+  stringData:
+    DB_PASSWORD: ${dbPassword}
+    DB_ROOT_PASSWORD: ${dbRootPassword}
+    DB_USER: ${appName}
+
+# Persistant storage for MySQL data
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata: 
+    finalizers:
+    - kubernetes.io/pvc-protection
+    name: ${appName}-mysql-storage
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    - ReadWriteMany
+    resources:
+      requests:
+        storage: ${MYSQL_VOLUME_SIZE}
+    storageClassName: snap
+    volumeMode: Filesystem
+
+# Persistant storage for MySQL backups
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata: 
+    finalizers:
+    - kubernetes.io/pvc-protection
+    name: ${appName}-mysql-backups
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    - ReadWriteMany
+    resources:
+      requests:
+        storage: ${MYSQL_VOLUME_SIZE}
+    storageClassName: snap
+    volumeMode: Filesystem
+
+# DeploymentConfig from mysql
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    name: ${appName}-mysql
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 5
+    selector:
+      app: mysql
+      deploymentconfig: mysql
+    strategy:
+      activeDeadlineSeconds: 21600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        annotations:
+          openshift.io/generated-by: OpenShiftWebConsole
+        creationTimestamp: null
+        labels:
+          app: mysql
+          deploymentconfig: mysql
+      spec:
+        containers:
+        - env:
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: DB_PASSWORD
+                name: ${appName}-mysql
+          - name: MYSQL_USER
+            valueFrom:
+              secretKeyRef:
+                key: DB_USER
+                name: ${appName}-mysql
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: DB_ROOT_PASSWORD
+                name: ${appName}-mysql
+          - name: MYSQL_DATABASE
+            value: ${appName}
+          - name: BACKUP_PATH
+            value: /backups
+          image: docker.io/jward3/openshift-mysql@sha256:1501eaaef8ee4c54fc696e407ddf5f9a0c3c0911696d350192913ff38f37b479
+          imagePullPolicy: IfNotPresent
+          name: mysql
+          ports:
+          - containerPort: 3306
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+
+          volumeMounts:
+          - mountPath: /var/lib/mysql/data
+            name: ${appName}-mysql-storage
+          - mountPath: /backups
+            name: ${appName}-mysql-backups
+            subPath: epam_backups
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+
+        volumes:
+        - name: ${APP_NAME}-mysql-storage
+          persistentVolumeClaim:
+            claimName: ${APP_NAME}-mysql-storage
+        - name: ${APP_NAME}-mysql-backups
+          persistentVolumeClaim:
+            claimName: ${APP_NAME}-mysql-backups
+    test: false
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - mysql
+        from:
+          kind: ImageStreamTag
+          name: openshift-mysql:latest
+          namespace: dept-gpm
+        lastTriggeredImage: docker.io/jward3/openshift-mysql@sha256:1501eaaef8ee4c54fc696e407ddf5f9a0c3c0911696d350192913ff38f37b479
+      type: ImageChange
+    - type: ConfigChange
+
+### TODO ###
+# * Add backup cronjob see https://www.sainsmograf.com/blog/2020/05/25/setting-up-automatic-daily-database-backup-on-kubernetes/, 
+
+# Service for MySQL deployment
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: ${APP_NAME}-mysql
+  spec:
+    ports:
+    - name: mysql
+      port: 3306
+      protocol: TCP
+      targetPort: 3306
+    selector:
+      name: ${APP_NAME}-mysql
+
+parameters:
+- name: appName
+- name: dbPassword
+  description: Password used for MySQL authentication
+  generate: expression
+  from: '[A-Z0-9]{8}'
+- name: dbRootPassword
+  description: Password used for MySQL root authentication
+  generate: expression
+  from: '[A-Z0-9]{12}'
+- name: dbVolumeSize
+  description: Size of the PVC.  Should be <int>[Ki|Mi|Gi|Ti|Pi|Ei] where <int> >= 100Mi; defaults to 2Gi
+  default: 2Gi

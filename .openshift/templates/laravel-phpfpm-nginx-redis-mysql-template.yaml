@@ -1,0 +1,619 @@
+kind: Template
+apiVersion: template.openshift.io/v1
+metadata:
+  name: laravel-phpfpm-nginx-redis-mysql
+  annotations:
+    description: "Creates Secrets and MySQL deploymentconfig and service."
+    iconClass: "icon-mysql"
+    tags: "database,sql"
+
+parameters:
+- name: namespace
+  required: true
+- name: appName
+  description: Name to use for the app
+  required: true
+- name: repoUrl
+  description: URL for the repo containing the app code
+  required: true
+- name: repoBranch
+  description: branch to use for build
+  value: master
+- name: backendContextDir
+  description: Context directory for the backend app build
+  value: "backend"
+- name: frontendContextDir
+  description: Context directory for the frontend app build
+  value: "frontend"
+
+- name: appDebug
+  description: Boolean value to apply to debug env.
+  value: "false"
+- name: appEnv
+  description: Environment type [dev|demo|production]
+  value: production
+- name: appUrl
+  description: URL for app
+  required: true
+- name: httpScheme
+  description: scheme to explicitely set for Laravel.
+  value: https://
+- name: cacheDriver
+  description: cacheDriver to use
+  value: redis
+- name: mailFromAddress
+  description: Address mail is sent from
+  value: jward3@email.unc.edu
+- name: mailFromName
+  description: Name of mail sender
+  value: TJ Ward
+- name: mailer
+  value: log
+- name: mailHost
+  value: relay.unc.edu
+- name: queueConnection
+  value: redis
+- name: sessionDriver
+  value: redis
+- name: sessionLifetime
+  value: "120"
+- name: appKey
+  description: cryptographic key used to authenticate sessions in laravel.
+  required: true
+
+- name: redisVolumeSize
+  value: 1Gi
+- name: redisPassword
+  generate: expression
+  from: '[A-Z0-9]{12}'
+
+- name: dbPassword
+  description: Password used for MySQL authentication
+  generate: expression
+  from: '[A-Z0-9]{8}'
+- name: dbRootPassword
+  description: Password used for MySQL root authentication
+  generate: expression
+  from: '[A-Z0-9]{12}'
+- name: dbVolumeSize
+  description: Size of the PVC.  Should be <int>[Ki|Mi|Gi|Ti|Pi|Ei] where <int> >= 100Mi; defaults to 2Gi
+  value: 2Gi
+
+objects:
+## MYSQL
+# MYSQL Secret
+- kind: Secret
+  apiVersion: v1
+  type: Opaque
+  metadata:
+    name: ${appName}-mysql
+  stringData:
+    DB_PASSWORD: ${dbPassword}
+    DB_ROOT_PASSWORD: ${dbRootPassword}
+    DB_USER: ${appName}
+#
+
+# MySQL Storage Volume
+- kind: PersistentVolumeClaim
+  apiVersion: v1
+  metadata: 
+    finalizers:
+    - kubernetes.io/pvc-protection
+    name: ${appName}-mysql-storage
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    - ReadWriteMany
+    resources:
+      requests:
+        storage: ${dbVolumeSize}
+    storageClassName: snap
+    volumeMode: Filesystem
+#
+
+# MySQL backups Volume
+- kind: PersistentVolumeClaim
+  apiVersion: v1
+  metadata: 
+    finalizers:
+    - kubernetes.io/pvc-protection
+    name: ${appName}-mysql-backups
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    - ReadWriteMany
+    resources:
+      requests:
+        storage: ${dbVolumeSize}
+    storageClassName: snap
+    volumeMode: Filesystem
+#
+
+# MySQL DeploymentConfig
+- kind: DeploymentConfig
+  apiVersion: apps.openshift.io/v1
+  metadata:
+    name: ${appName}-mysql
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 5
+    selector:
+      app: mysql
+      deploymentconfig: mysql
+    strategy:
+      activeDeadlineSeconds: 21600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        annotations:
+          openshift.io/generated-by: OpenShiftWebConsole
+        creationTimestamp: null
+        labels:
+          app: mysql
+          deploymentconfig: mysql
+      spec:
+        containers:
+        - env:
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: DB_PASSWORD
+                name: ${appName}-mysql
+          - name: MYSQL_USER
+            valueFrom:
+              secretKeyRef:
+                key: DB_USER
+                name: ${appName}-mysql
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: DB_ROOT_PASSWORD
+                name: ${appName}-mysql
+          - name: MYSQL_DATABASE
+            value: ${appName}
+          - name: BACKUP_PATH
+            value: /backups
+          image: docker.io/jward3/openshift-mysql@sha256:1501eaaef8ee4c54fc696e407ddf5f9a0c3c0911696d350192913ff38f37b479
+          imagePullPolicy: IfNotPresent
+          name: mysql
+          ports:
+          - containerPort: 3306
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+
+          volumeMounts:
+          - mountPath: /var/lib/mysql/data
+            name: ${appName}-mysql-storage
+          - mountPath: /backups
+            name: ${appName}-mysql-backups
+            subPath: epam_backups
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+
+        volumes:
+        - name: ${appName}-mysql-storage
+          persistentVolumeClaim:
+            claimName: ${appName}-mysql-storage
+        - name: ${appName}-mysql-backups
+          persistentVolumeClaim:
+            claimName: ${appName}-mysql-backups
+    test: false
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - mysql
+        from:
+          kind: ImageStreamTag
+          name: openshift-mysql:latest
+          namespace: dept-gpm
+        lastTriggeredImage: docker.io/jward3/openshift-mysql@sha256:1501eaaef8ee4c54fc696e407ddf5f9a0c3c0911696d350192913ff38f37b479
+      type: ImageChange
+    - type: ConfigChange
+#
+
+## REDIS
+- kind: Secret
+  apiVersion: v1
+  type: Opaque
+  metadata:
+    name: ${appName}-redis
+  dataString:
+    REDIS_PASSWORD: ${redisPassword}
+#
+
+- kind: PersistentVolumeClaim
+  apiVersion: v1
+  metadata: 
+    finalizers:
+    - kubernetes.io/pvc-protection
+    name: ${appName}-redis-storage
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: ${redisVolumeSize}
+    storageClassName: snap
+    volumeMode: Filesystem
+#
+
+- kind: DeploymentConfig
+  apiVersion: apps.openshift.io/v1
+  metadata:
+    labels:
+      app: ${appName}-redis
+    name: ${appName}-redis
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      app: ${appName}-redis
+      deploymentconfig: ${appName}-redis
+    strategy:
+      activeDeadlineSeconds: 21600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          app: ${appName}-redis
+          deploymentconfig: ${appName}-redis
+      spec:
+        containers:
+        - env:
+          envFrom:
+          - secretRef:
+              name: ${appName}-redis
+          image: >-
+            centos/redis-5-centos7@sha256:3bf9417376fa7b1100afe5194d41659945be2b7efedced325b8c60042f2cfa23
+          imagePullPolicy: Always
+          name: ${appName}-redis
+          ports:
+            - containerPort: 6379
+              protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /var/lib/redis/data
+              name: ${appName}-redis-storage
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+          - emptyDir: {}
+            name: ${appName}-redis-storage
+    test: false
+    triggers:
+      - type: ConfigChange
+      - imageChangeParams:
+          automatic: true
+          containerNames:
+            - redis
+          from:
+            kind: ImageStreamTag
+            name: 'redis:latest'
+          lastTriggeredImage: >-
+            centos/redis-5-centos7@sha256:3bf9417376fa7b1100afe5194d41659945be2b7efedced325b8c60042f2cfa23
+        type: ImageChange
+#
+
+## PHP FPM 
+
+# Laravel APP_KEY secret
+- kind: Secret
+  apiVersion: v1
+  metadata:
+    name: ${appName}-app-key
+  dataString:
+    APP_KEY: ${appKey}
+  type: Opaque
+#
+  
+
+# Laravel ConfigMap
+- kind: ConfigMap
+  apiVersion: v1
+  metadata:
+    name: ${appName}-backend-config
+  data:
+    APP_NAME: ${appName}
+    APP_DEBUG: ${appDebug}
+    APP_ENV: ${appEnv}
+    APP_URL: ${appUrl}
+    URL_SCHEME: ${urlScheme}
+    BROADCAST_DRIVER: log
+    CACHE_DRIVER: ${cacheDriver}
+    DB_CONNECTION: mysql
+    DB_DATABASE: ${appName}
+    DB_HOST: ${appName}-mysql
+    DB_PORT: "3306"
+    LOG_CHANNEL: stack
+    LOG_LEVEL: debug
+    MAIL_ENCRYPTION: "null"
+    MAIL_FROM_ADDRESS: ${mailFromAddress}
+    MAIL_FROM_NAME: ${mailFromName}
+    MAIL_HOST: ${mailHost}
+    MAIL_MAILER: ${mailer}
+    MAIL_PASSWORD: "null"
+    MAIL_PORT: "25"
+    MAIL_USERNAME: "null"
+    QUEUE_CONNECTION: ${queueConnection}
+    REDIS_HOST: redis
+    REDIS_PORT: "6379"
+    SANCTUM_STATEFUL_DOMAINS: ${appUrl}
+    SESSION_DRIVER: ${sessionDriver}
+    SESSION_LIFETIME: ${sessionLifetime}
+#
+
+# backend ImageStream
+- kind: ImageStream
+  apiVersion: image.openshift.io/v1
+  metadata:
+    name: ${appName}-backend
+    labels:
+      app: ${appName}-backend
+      app.kubernetes.io/component: ${appName}-backend
+      app.kubernetes.io/instance: ${appName}-backend
+  spec:
+    lookupPolicy:
+        local: false
+#
+
+# backend BuildConfig
+- kind: BuildConfig
+  apiVersion: build.openshift.io/v1
+  metadata:
+    name: ${appName}-backend
+    labels:
+      app: ${appName}-backend
+      app.kubernetes.io/component: ${appName}-backend
+      app.kubernetes.io/instance: ${appName}-backend
+  spec:
+    failedBuildsHistoryLimit: 5
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ${appName}-backend:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      contextDir: ${backendContextDir}
+      git:
+        uri: ${repoUrl}
+        ref: ${repoBranch}
+      type: Git
+    strategy:
+      dockerStrategy:
+        from:
+          kind: ImageStreamTag
+          name: php:8.1-fpm
+      type: Docker
+    successfulBuildsHistoryLimit: 5
+    triggers:
+    # - github:
+    #     secret: setF8bOVmcXpLMBCiLkJ
+    #   type: GitHub
+    # - generic:
+    #     secret: bM2jjZeklMTpvJmFc7W5
+    #   type: Generic
+    - type: ConfigChange
+    - imageChange: {}
+      type: ImageChange
+#
+# backend Deployment
+- kind: Deployment
+  apiVersion: apps/v1
+  metadata:
+    labels:
+      app: ${appName}
+      app.kubernetes.io/component: ${appName}
+      app.kubernetes.io/instance: ${appName}
+      app.kubernetes.io/part-of: ${appName}
+    name: ${appName}
+    # annotations:
+    #   image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"fai:latest"},"fieldPath":"spec.template.spec.containers[?(@.name==\"fai\")].image"}]'
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 2
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        deployment: ${appName}-backend
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          deployment: ${appName}-backend
+      spec:
+        containers:
+        - name: ${appName}-backend
+          ports:
+          - containerPort: 9000
+            protocol: TCP        
+          env:
+          - name: CONTAINER_ROLE
+            value: backend
+          envFrom:
+          - secretRef:
+              name: ${appName}-mysql
+          - secretRef:
+              name: ${appName}-app-key
+          - configMapRef:
+              name: ${appName}-backend-config
+          image: image-registry.openshift-image-registry.svc:5000/${namespace}/${appName}-backend
+          imagePullPolicy: IfNotPresent
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /srv/app/storage
+            name: backups
+            subPath: app
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: value-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes: # TODO
+        - name: backups
+          persistentVolumeClaim:
+            claimName:  ${appName}-mysql-backups
+#
+
+## nginx
+
+# nginx ImageStream
+- kind: ImageStream
+  apiVersion: image.openshift.io/v1
+  metadata:
+    name: ${appName}-frontend
+    labels:
+      app: ${appName}-frontend
+      app.kubernetes.io/component: ${appName}-frontend
+      app.kubernetes.io/instance: ${appName}-frontend
+  spec:
+    lookupPolicy:
+        local: false
+#
+# nginx BuildConfig
+- kind: BuildConfig
+  apiVersion: build.openshift.io/v1
+  metadata:
+    name: ${appName}-frontend
+    labels:
+      app: ${appName}-frontend
+      app.kubernetes.io/component: ${appName}-frontend
+      app.kubernetes.io/instance: ${appName}-frontend
+  spec:
+    failedBuildsHistoryLimit: 5
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ${appName}-frontend:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      contextDir: ${frontendContextDir}
+      git:
+        uri: ${repoUrl}
+        ref: ${repoBranch}
+      type: Git
+    strategy:
+      type: Docker
+    successfulBuildsHistoryLimit: 5
+    triggers:
+    # - github:
+    #     secret: setF8bOVmcXpLMBCiLkJ
+    #   type: GitHub
+    # - generic:
+    #     secret: bM2jjZeklMTpvJmFc7W5
+    #   type: Generic
+    - type: ConfigChange
+    - imageChange: {}
+      type: ImageChange
+#
+# nginx Deployment
+- kind: Deployment
+  apiVersion: apps/v1
+  metadata:
+    labels:
+      app: ${appName}
+      app.kubernetes.io/component: ${appName}
+      app.kubernetes.io/instance: ${appName}
+      app.kubernetes.io/part-of: ${appName}
+    name: ${appName}-frontend
+    # annotations:
+    #   image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"fai:latest"},"fieldPath":"spec.template.spec.containers[?(@.name==\"fai\")].image"}]'
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        deployment: ${appName}-frontend
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          deployment: ${appName}-frontend
+      spec:
+        containers:
+        - env:
+          - name: CONTAINER_ROLE
+            value: frontend
+          image: image-registry.openshift-image-registry.svc:5000/${namespace}/${appName}-frontend
+          imagePullPolicy: IfNotPresent
+          name: ${appName}-frontend
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: value-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+#
+
+# nginx service
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: ${appName}-frontend
+    annortation: Exposes and load balances the webserver
+  spec:
+    ports: 
+      - name: "web"
+        port: 8080
+        targetPort: 8080
+    selector: 
+      name: ${appName}-frontend
+#
+# route to nginx
+- kind: Route
+  apiVersion: v1
+  metadata:
+    name: ${appName}-frontend
+    annotations: 
+      template.openshift.io/expose-uri: "http://{.spec.host}{.spec.path}" 
+  spec:
+    host: ${appUrl}
+    to:
+      kind: Service
+      name: ${appName}-frontend

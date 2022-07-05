@@ -1,0 +1,159 @@
+kind: Template
+apiVersion: template.openshift.io/v1
+metadata:
+  name: laravel-phpfpm-nginx-redis-mysql
+  annotations:
+    description: "Creates Secrets and MySQL deploymentconfig and service."
+    iconClass: "icon-mysql"
+    tags: "database,sql"
+
+parameters:
+- name: namespace
+  required: true
+- name: appName
+  description: Name to use for the app
+  required: true
+- name: repoUrl
+  description: URL for the repo containing the app code
+  required: true
+- name: repoBranch
+  description: branch to use for build
+  value: master
+- name: frontendContextDir
+  description: Context directory for the frontend app build
+  value: "."
+- name: appUrl
+  description: URL for app
+  required: true
+
+objects:
+# nginx ImageStream
+- kind: ImageStream
+  apiVersion: image.openshift.io/v1
+  metadata:
+    name: ${appName}-frontend
+    labels:
+      app: ${appName}-frontend
+      app.kubernetes.io/component: ${appName}-frontend
+      app.kubernetes.io/instance: ${appName}-frontend
+  spec:
+    lookupPolicy:
+        local: false
+#
+# nginx BuildConfig
+- kind: BuildConfig
+  apiVersion: build.openshift.io/v1
+  metadata:
+    name: ${appName}-frontend
+    labels:
+      app: ${appName}-frontend
+      app.kubernetes.io/component: ${appName}-frontend
+      app.kubernetes.io/instance: ${appName}-frontend
+  spec:
+    failedBuildsHistoryLimit: 5
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ${appName}-frontend:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      contextDir: ${frontendContextDir}
+      git:
+        uri: ${repoUrl}
+        ref: ${repoBranch}
+      type: Git
+    strategy:
+      type: Docker
+      #   from:
+      #     kind: ImageStreamTag
+      #     name: php:8.1-fpm
+    successfulBuildsHistoryLimit: 5
+    triggers:
+    # - github:
+    #     secret: setF8bOVmcXpLMBCiLkJ
+    #   type: GitHub
+    # - generic:
+    #     secret: bM2jjZeklMTpvJmFc7W5
+    #   type: Generic
+    - type: ConfigChange
+    - imageChange: {}
+      type: ImageChange
+#
+# nginx Deployment
+- kind: Deployment
+  apiVersion: apps/v1
+  metadata:
+    labels:
+      app: ${appName}
+      app.kubernetes.io/component: ${appName}
+      app.kubernetes.io/instance: ${appName}
+      app.kubernetes.io/part-of: ${appName}
+    name: ${appName}-frontend
+    # annotations:
+    #   image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"fai:latest"},"fieldPath":"spec.template.spec.containers[?(@.name==\"fai\")].image"}]'
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        deployment: ${appName}-frontend
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          deployment: ${appName}-frontend
+      spec:
+        containers:
+        - env:
+          - name: CONTAINER_ROLE
+            value: frontend
+          image: image-registry.openshift-image-registry.svc:5000/${namespace}/${appName}-frontend
+          imagePullPolicy: IfNotPresent
+          name: ${appName}-frontend
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: value-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+#
+
+# nginx service
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: ${appName}-frontend
+    annortation: Exposes and load balances the webserver
+  spec:
+    ports: 
+      - name: "web"
+        port: 8080
+        targetPort: 8080
+    selector: 
+      name: ${appName}-frontend
+#
+# route to nginx
+- kind: Route
+  apiVersion: v1
+  metadata:
+    name: ${appName}-frontend
+    annotations: 
+      template.openshift.io/expose-uri: "http://{.spec.host}{.spec.path}" 
+  spec:
+    host: ${appUrl}
+    to:
+      kind: Service
+      name: ${appName}-frontend

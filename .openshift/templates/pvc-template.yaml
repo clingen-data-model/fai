@@ -1,0 +1,26 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: pvc-template
+objects:
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata: 
+    finalizers:
+    - kubernetes.io/pvc-protection
+    name: ${NAME}
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    - ReadWriteMany
+    resources:
+      requests:
+        storage: ${SIZE}
+    storageClassName: snap
+    volumeMode: Filesystem
+
+parameters:
+- name: NAME
+  description: Name of the PVC
+- name: SIZE
+  description: Size of the PVC.  Should be <int>[Ki|Mi|Gi|Ti|Pi|Ei] where <int> >= 100Mi
