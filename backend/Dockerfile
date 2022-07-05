@@ -29,7 +29,6 @@ RUN composer install \
         --no-plugins \
         --no-scripts \
         --no-dev \
-        --no-suggest \
         --prefer-dist
 
 # We need this directory because Tinker depends on psysh
