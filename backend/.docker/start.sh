@@ -8,10 +8,10 @@ env=${CONTAINER_ENV:-production}
 if [ "$env" != "local" ]; then
     echo "Caching configuration..."
     # (cd /srv/app && php artisan config:cache && php artisan route:cache && php artisan view:cache)
-    (cd /srv/app && .openshift/deploy.sh)
+    (cd /var/www/html && .openshift/deploy.sh)
 fi
 
-# php /srv/app/artisan storage:link --relative --force
+# php /var/www/html storage:link --relative --force
 
 if [ "$role" = "app" ]; then
 
@@ -24,13 +24,13 @@ elif [ "$role" = "queue" ]; then
     echo "SESSION_DRIVER: $SESSION_DRIVER"
     echo "CACHE_DRIVER: $CACHE_DRIVER"
     echo "QUEUE_CONNECTION: $QUEUE_CONNECTION..."
-    php /srv/app/artisan queue:work --verbose --tries=3 --timeout=90
+    php /var/www/html queue:work --verbose --tries=3 --timeout=90
 
 elif [ "$role" = "scheduler" ]; then
 
     while [ true ]
     do
-      php /srv/app/artisan schedule:run --verbose --no-interaction &
+      php /var/www/html schedule:run --verbose --no-interaction &
       sleep 60
     done
 
