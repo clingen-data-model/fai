@@ -62,7 +62,7 @@ parameters:
   required: true
 
 - name: redisVolumeSize
-  value: 1Gi
+  value: 500Mi
 - name: redisPassword
   generate: expression
   from: '[A-Z0-9]{12}'
@@ -77,7 +77,7 @@ parameters:
   from: '[A-Z0-9]{12}'
 - name: dbVolumeSize
   description: Size of the PVC.  Should be <int>[Ki|Mi|Gi|Ti|Pi|Ei] where <int> >= 100Mi; defaults to 2Gi
-  value: 2Gi
+  value: 1Gi
 
 objects:
 ## MYSQL
@@ -433,7 +433,7 @@ objects:
       app.kubernetes.io/component: ${appName}
       app.kubernetes.io/instance: ${appName}
       app.kubernetes.io/part-of: ${appName}
-    name: ${appName}
+    name: ${appName}-backend
     # annotations:
     #   image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"fai:latest"},"fieldPath":"spec.template.spec.containers[?(@.name==\"fai\")].image"}]'
   spec:
@@ -575,6 +575,8 @@ objects:
         - env:
           - name: CONTAINER_ROLE
             value: frontend
+          - name: BACKEND
+            value: ${appName}-backend
           image: image-registry.openshift-image-registry.svc:5000/${namespace}/${appName}-frontend
           imagePullPolicy: IfNotPresent
           name: ${appName}-frontend
@@ -597,6 +599,8 @@ objects:
   metadata:
     name: ${appName}-frontend
     annortation: Exposes and load balances the webserver
+    labels:
+      app: fai-frontend
   spec:
     ports: 
       - name: "web"
