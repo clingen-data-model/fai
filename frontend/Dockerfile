@@ -20,6 +20,7 @@ RUN npm run build
 FROM registry.hub.docker.com/nginxinc/nginx-unprivileged:1.23
 
 COPY ./.docker/nginx.conf /etc/nginx/nginx.conf
+COPY ./.docker/http.conf.template /etc/nginx/templates/http.conf.template
 COPY --from=builder /usr/src /usr/share/nginx/html
 
 EXPOSE 8080/tcp
