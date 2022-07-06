@@ -4,10 +4,11 @@ const routes = [
     {
         name: 'Dashboard',
         path: '/',
-        component: () => import('@/views/Dashboard.vue'),
-        meta: {
-            protected: true
-        }
+        redirect: {name: 'FunctionalAssayIndex'}
+        // component: () => import('@/views/Dashboard.vue'),
+        // meta: {
+        //     protected: true
+        // }
     },
     { name: 'AssayClassIndex',
         path: '/assay-classes',
