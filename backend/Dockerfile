@@ -63,4 +63,4 @@ RUN php artisan storage:link
 USER 1001
 
 # Run the start command.
-CMD ["/usr/local/bin/start"]
+# CMD ["/usr/local/bin/start"]

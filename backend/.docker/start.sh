@@ -6,9 +6,9 @@ role=${CONTAINER_ROLE:-app}
 env=${CONTAINER_ENV:-production}
 
 if [ "$env" != "local" ]; then
-    echo "Caching configuration..."
+    # echo "Caching configuration..."
     # (cd /srv/app && php artisan config:cache && php artisan route:cache && php artisan view:cache)
-    (cd /var/www/html && .openshift/deploy.sh)
+    # (cd /var/www/html && .openshift/deploy.sh)
 fi
 
 # php /var/www/html storage:link --relative --force
