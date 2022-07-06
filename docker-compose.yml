@@ -35,6 +35,8 @@ services:
     frontend: 
         build: ./frontend
         image: nginx:1.21
+        environment:
+            - BACKEND=backend
         # volumes:
         #     - ./frontend/.docker/nginx.conf:/etc/nginx/nginx.conf:ro
         #     - ./frontend:/usr/share/nginx/html:ro
