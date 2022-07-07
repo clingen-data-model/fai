@@ -71,3 +71,12 @@ Route::group([
     Route::get('/{publication}', PublicationFind::class);
     Route::put('/{publication}', PublicationUpdate::class);
 });
+
+Route::group([
+    'prefix' => 'raw-imports'
+], function () {
+    Route::get('/{id}', function ($id) {
+        // return $id;
+        return \App\Models\RawImport::findOrFail($id);
+    });
+});
