@@ -11,6 +11,6 @@ class FunctionalAssayList
 
     public function handle(ActionRequest $request)
     {
-        return FunctionalAssay::with('assayClasses')->get();
+        return FunctionalAssay::with(['assayClasses', 'publication'])->get();
     }    
 }
