@@ -27,8 +27,8 @@ services:
         links:
             - database:database
             # - redis:redis
-        # volumes:
-        #     - ./backend:/var/www/html
+        volumes:
+            - ./backend:/var/www/html
         environment:
             CONTAINER_ROLE: app
             CONTAINER_ENV: local
@@ -37,9 +37,9 @@ services:
         image: nginx:1.21
         environment:
             - BACKEND=backend
-        # volumes:
-        #     - ./frontend/.docker/nginx.conf:/etc/nginx/nginx.conf:ro
-        #     - ./frontend:/usr/share/nginx/html:ro
+        volumes:
+            - ./frontend/.docker/nginx.conf:/etc/nginx/nginx.conf:ro
+            - ./frontend:/usr/share/nginx/html:ro
         ports:
             - "8080:8080"
         depends_on:
