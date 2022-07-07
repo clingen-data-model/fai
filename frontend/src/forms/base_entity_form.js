@@ -37,7 +37,7 @@ class BaseEntityForm {
      async update (data) {
         this.clearErrors()
         try {
-            this.currentItem.value = this.repo.update(data)
+            this.currentItem.value = await this.repo.update(data)
         } catch (e) {
             if (isValidationError(e)) {
                 this.errors.value = e.response.data.errors

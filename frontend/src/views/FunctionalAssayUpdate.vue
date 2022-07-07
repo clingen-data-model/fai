@@ -42,7 +42,10 @@
         <template v-slot:header>
             <h1>Edit the Functional Assay</h1>
         </template>
-        <CrudUpdate :formDef="formDefinition"></CrudUpdate>
+        <div class="flex space-x-8">
+            <CrudUpdate :formDef="formDefinition"></CrudUpdate>
+            <div class="flex-grow border-l pl-8">stuff</div>
+        </div>
         <teleport to='body'> 
             <AssayClassCreateDialog 
                 @saved="formDefinition.loadAssayClasses()" 

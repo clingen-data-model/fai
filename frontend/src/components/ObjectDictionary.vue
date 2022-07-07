@@ -4,10 +4,11 @@
             v-for="(value, key) in filteredObj" 
             :key="key"
         >
-            <slot :label="titleCase(key)" :labelClass="labelClass" :rowValue="value" :key="key">
+            <slot :label="titleCase(key)" :rowValue="value" :key="key">
                 <dictionary-row 
                     :label="titleCase(key)"
-                    :label-class="labelClass"
+                    :label-class="$attrs.labelClass"
+                    :vertical="$attrs.vertical"
                 >
                     {{value}}
                 </dictionary-row>            
@@ -46,16 +47,20 @@ export default {
             required: false,
             default: () => []
         },
-        labelWidthClass: {
+        rowClass: {
             type: String,
-            required: false,
-            default: 'w-36'
-        },
-        labelClass: {
-            type: String,
-            required: false,
-            default: 'w-36'
+            default: ''
         }
+        // labelWidthClass: {
+        //     type: String,
+        //     required: false,
+        //     default: 'w-36'
+        // },
+        // labelClass: {
+        //     type: String,
+        //     required: false,
+        //     default: 'w-36'
+        // }
     },
     data() {
         return {

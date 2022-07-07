@@ -3,25 +3,33 @@
     import {useRouter} from 'vue-router'
 
     const tableFields = [
-        {
-            name: 'hgnc_id',
-            label: 'Gene'
+        { name: 'assay_classes',
+            label: 'Class of Assay',
+            resolveValue (item) {
+                return item.assay_classes.map(ac => ac.name).join(', ');
+            },
+            sortable: true
         },
-        {
-            name: 'affiliation_id',
-            label: 'Affiliation'
+        { name: 'gene_symbol',
+            label: 'Gene',
+            sortable: true
         },
-        {
-            name: 'publication_id',
-            label: 'Publication'
+        { name: 'affiliation_id',
+            label: 'Affiliation',
+            sortable: true
         },
-        { name: 'approved' },
-        { name: 'material_used' },
-        { name: 'patient_material_used' },
+        { name: 'publication.name',
+            label: 'Publication',
+            resolveValue (item) {
+                return item.publication.name
+            },
+            sortable: true
+        },
+        { name: 'approved', resolveValue (item) { return item.approved ? 'Yes' : 'No '} },
     ];
 
     const sort = ref({
-        field: 'hgnc_id',
+        field: 'gene_symbol',
         desc: false
     })
 
