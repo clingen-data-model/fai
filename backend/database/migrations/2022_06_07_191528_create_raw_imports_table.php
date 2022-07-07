@@ -17,8 +17,8 @@ return new class extends Migration
             $table->id();
             $table->string('assay_class');
             $table->integer('affiliation_id');
-            $table->unsignedBigInteger('pubmed_id');
-            $table->string('gene_symbol');
+            $table->string('pubmed_id');
+            $table->string('gene_symbol')->nullable();
             $table->boolean('approved')->default(false);
             $table->json('data');
             $table->timestamps();
