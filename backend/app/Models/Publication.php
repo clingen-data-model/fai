@@ -14,7 +14,10 @@ class Publication extends Model
     public $fillable = [
         'title',
         'coding_system_id',
-        'code'
+        'code',
+        'doi',
+        'year',
+        'author'
     ];
 
     public $casts = [

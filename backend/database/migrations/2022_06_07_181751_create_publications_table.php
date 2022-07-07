@@ -18,6 +18,9 @@ return new class extends Migration
             $table->string('title')->nullable();
             $table->unsignedBigInteger('coding_system_id');
             $table->string('code');
+            $table->string('doi')->nullable();
+            $table->string('year')->nullable();
+            $table->string('author')->nullable();
             $table->timestamps();
 
             $table->unique(['coding_system_id', 'code']);

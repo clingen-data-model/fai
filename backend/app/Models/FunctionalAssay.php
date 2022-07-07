@@ -16,6 +16,7 @@ class FunctionalAssay extends Model
         'affiliation_id',
         'publication_id',
         'hgnc_id',
+        'gene_symbol',
         'approved',
         'material_used',
         'patient_derived_material_used',
@@ -42,11 +43,13 @@ class FunctionalAssay extends Model
         'ep_basic_negative_control',
         'ep_proposed_strength_pathogenic',
         'ep_propsed_strength_benign',
+        'raw_import_id',
     ];
 
     public $casts = [
         'affiliation_id' => 'integer',
         'publication_id' => 'integer',
+        'raw_import_id' => 'integer',
         'approved' => 'boolean',
         'field_notes' => 'array'
     ];
