@@ -12,7 +12,8 @@
         },
         { name: 'gene_symbol',
             label: 'Gene',
-            sortable: true
+            sortable: true,
+            type: String
         },
         { name: 'affiliation_id',
             label: 'Affiliation',
@@ -28,8 +29,9 @@
         { name: 'approved', resolveValue (item) { return item.approved ? 'Yes' : 'No '} },
     ];
 
+    const filter = ref();
     const sort = ref({
-        field: 'gene_symbol',
+        field: tableFields[0],
         desc: false
     })
 
@@ -43,6 +45,11 @@
         });
     }
 
+
+    const getItems = async () => {
+       return await api.get(props.resourceUrl)
+            .then(response => response.data.data)
+    }
 </script>
 
 <template>
@@ -59,12 +66,14 @@
             deleteRouteName="PublicationDelete"
         >
             <template v-slot="{items}">
+                <InputRow label="filter" v-model="filter" labelWidthClass="w-auto pr-2"/>
                 <DataTable
                     :fields="tableFields"
                     :data="items"
                     v-model:sort="sort"
                     @rowClick="goToItem"
                     rowClass="cursor-pointer"
+                    :filterTerm="filter"
                 ></DataTable>
             </template>
         </CrudIndex>

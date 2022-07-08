@@ -21,7 +21,6 @@
 
 <template>
     <div>
-<!-- <pre>{ currentPage: {{currentPage}} }</pre> -->
         <header class="flex justify-between mb-2 items-center">
             <slot name="header"></slot>
             <pagination-links 
@@ -53,13 +52,13 @@
                                 <div>
                                     <div v-if="field.sortable">
                                         <icon-cheveron-up icon-color="#ccc" 
-                                            v-if="realSort.field != field"
+                                            v-if="sort.field.name != field.name"
                                         ></icon-cheveron-up>
                                         <icon-cheveron-up icon-color="#333" 
-                                            v-if="realSort.field == field && !realSort.desc"
+                                            v-if="sort.field.name == field.name && !sort.desc"
                                         ></icon-cheveron-up>
                                         <IconCheveronDown icon-color="#333" 
-                                            v-if="realSort.field == field && realSort.desc"
+                                            v-if="sort.field.name == field.name && sort.desc"
                                         ></IconCheveronDown>
                                     </div>
                                 </div>
@@ -152,14 +151,8 @@ export default {
             default: null
         },
         sort: {
-            required: false,
+            required: true,
             type: Object,
-            default: () => {
-                return {
-                    field: 'id',
-                    desc: false
-                }
-            }
         },
         detailRows: {
             type: Boolean,
@@ -173,36 +166,36 @@ export default {
     },
     data() {
         return {
-            realSort: {
-                field: {},
-                desc: false
-            },
+            // sort: {
+            //     field: {},
+            //     desc: false
+            // },
             resolvedItems: [],
             currentPage: 1,
             totalItems: 0
         }
     },
     watch: {
-        sort: {
-            immediate: true,
-            handler: function() {
-                if (!this.sort) {
-                    this.realSort = {
-                        field: this.fields[0],
-                        desc: false
-                    }
-                    this.getItems()
-                    return;
-                }
+        // sort: {
+        //     immediate: true,
+        //     handler: function(to) {
+        //         if (!this.sort) {
+        //             this.realSort = {
+        //                 field: this.fields[0],
+        //                 desc: false
+        //             }
+        //             this.getItems()
+        //             return;
+        //         }
 
-                this.realSort = {
-                    field: this.fields.find(i => i.name == this.sort.field),
-                    desc: this.sort.desc
-                }
-                this.resetCurrentPage();
-                this.getItems()
-            }
-        },
+        //         this.realSort = {
+        //             field: this.fields.find(i => i.name == to.field),
+        //             desc: to.desc
+        //         }
+        //         this.resetCurrentPage();
+        //         this.getItems()
+        //     }
+        // },
         filterTerm() {
             this.getItems();
         },
@@ -232,24 +225,28 @@ export default {
             return this.filter ? this.filter : this.defaultFilter;
         },
         sortField() {
-            return this.realSort.field;
+            return this.sort.field;
         },
         sortFieldName() {
-            if (this.realSort.field.sortName) {
-                return this.realSort.field.sortName
+            if (this.sort.field.sortName) {
+                return this.sort.field.sortName
             }
-            return this.realSort.field.Name;
+            return this.sort.field.Name;
         }
     },
     methods: {
         async getItems () {
             if (this.dataIsFunction) {
-                this.resolvedItems = await this.data(this.currentPage, this.pageSize, this.realSort, this.setTotalItems);
+                this.resolvedItems = await this.data(this.currentPage, this.pageSize, this.sort, this.setTotalItems);
                 return;
             }
 
-            const allItems = this.sortData(this.filterData(this.data));
+            // spread and re-array so we don't accidentally mutate prop data
+            const dataCopy = [...this.data];
+            const allItems = this.sortData(this.filterData(dataCopy));
+
             this.resolvedItems = this.paginated ? this.paginate(allItems) : allItems;
+            
             this.setTotalItems(allItems.length);
         },
         setTotalItems(totalItemCount) {
@@ -268,16 +265,16 @@ export default {
             return data.slice(startIndex, endIndex);
         },
         sortData (data) {
-            const sortType = this.realSort.field.type;
+            const sortType = this.sort.field.type || String;
 
             if (this.dataIsFunction) {
                 this.getItems();
                 return;
             }
 
-            if (this.realSort.field.sortFunction) {
-                const sorted = data.sort(this.realSort.field.sortFunction)
-                if (this.realSort.desc) {
+            if (this.sort.field.sortFunction) {
+                const sorted = data.sort(this.sort.field.sortFunction)
+                if (this.sort.desc) {
                     return sorted.reverse();
                 }
 
@@ -346,13 +343,13 @@ export default {
         },
         
         updateSort(field) {
-            const oldField = this.realSort.field;
+            const oldField = this.sort.field;
             const newSort = {
-                field: field.name,
-                desc: !this.realSort.desc
+                field: field,
+                desc: !this.sort.desc
             }
-            
-            if (oldField != field) {
+
+            if (oldField.name != field.name) {
                 newSort.desc = false
             }
 
@@ -364,10 +361,10 @@ export default {
             })
         },
         textAndNumberSort(a, b) {
-            const coefficient = this.realSort.desc ? -1 : 1;
+            const coefficient = this.sort.desc ? -1 : 1;
             let aVal = this.resolveSortAttribute(a, this.sortField);
             let bVal = this.resolveSortAttribute(b, this.sortField);
-            if (this.realSort.field.type == String && aVal !== null && bVal !== null) {
+            if (this.sort.field.type == String && aVal !== null && bVal !== null) {
                 aVal = aVal.toLowerCase();
                 bVal = bVal.toLowerCase();
             }
@@ -380,7 +377,7 @@ export default {
             return coefficient*((aVal > bVal) ? 1 : -1);
         },
         dateSort(a, b) {
-            const coefficient = this.realSort.desc ? -1 : 1;
+            const coefficient = this.sort.desc ? -1 : 1;
 
             let aVal = Date.parse(this.resolveSortAttribute(a, this.sortField));
             if (isNaN(parseFloat(aVal))) {
@@ -432,7 +429,7 @@ export default {
                 classes.push('cursor-pointer underline hover:bg-gray-300');
             }
             if (field.colspan == 1) {
-                if (this.realSort.field == field) {
+                if (this.sort.field == field) {
                     classes.push(field)
                 }
             }

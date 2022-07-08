@@ -1,11 +1,14 @@
-<style lang="postcss">
+<style scoped>
+    .link {
+
+    }
     .link.active {
-        @apply text-gray-600;
+        @apply text-gray-600 font-bold underline;
     }
 </style>
 <template>
     <div>
-        <ul class="flex pagination-control">
+        <ul class="flex pagination-control space-x-2">
             <li>
                 <button class="link" @click="goToPreviousPage" :class="{active: currentPage === 1}">&lt;</button>
             </li>
