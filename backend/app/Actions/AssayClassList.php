@@ -13,7 +13,7 @@ class AssayClassList
 
     public function handle(ActionRequest $request): Collection
     {
-        $query = AssayClass::query();
+        $query = AssayClass::query()->orderBy('name');
 
         if ($request->filter) {
             $query->orlikeName($request->filter);
