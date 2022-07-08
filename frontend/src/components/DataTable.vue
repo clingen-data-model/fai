@@ -1,24 +1,3 @@
-<style scoped>
-    table {
-        @apply w-full;
-    }
-    tbody{
-        @apply bg-white odd:bg-gray-100 border-0 hover:border-blue-300 hover:bg-blue-100
-    }
-    tr > th {
-        @apply text-left border border-gray-300 px-3
-    }
-    tr:not(.details) > td {
-        @apply text-left p-1 px-3 border align-top;
-    }
-    tr.details > td {
-        @apply border-none p-0;
-    }
-    th.sorted, td.sorted  {
-        @apply bg-blue-100 hover:bg-blue-100
-    }
-</style>
-
 <template>
     <div>
         <header class="flex justify-between mb-2 items-center">
@@ -52,13 +31,13 @@
                                 <div>
                                     <div v-if="field.sortable">
                                         <icon-cheveron-up icon-color="#ccc" 
-                                            v-if="sort.field.name != field.name"
+                                            v-if="internalSort.field.name != field.name"
                                         ></icon-cheveron-up>
                                         <icon-cheveron-up icon-color="#333" 
-                                            v-if="sort.field.name == field.name && !sort.desc"
+                                            v-if="internalSort.field.name == field.name && !internalSort.desc"
                                         ></icon-cheveron-up>
                                         <IconCheveronDown icon-color="#333" 
-                                            v-if="sort.field.name == field.name && sort.desc"
+                                            v-if="internalSort.field.name == field.name && internalSort.desc"
                                         ></IconCheveronDown>
                                     </div>
                                 </div>
@@ -166,36 +145,36 @@ export default {
     },
     data() {
         return {
-            // sort: {
-            //     field: {},
-            //     desc: false
-            // },
+            internalSort: {
+                field: {},
+                desc: false
+            },
             resolvedItems: [],
             currentPage: 1,
             totalItems: 0
         }
     },
     watch: {
-        // sort: {
-        //     immediate: true,
-        //     handler: function(to) {
-        //         if (!this.sort) {
-        //             this.realSort = {
-        //                 field: this.fields[0],
-        //                 desc: false
-        //             }
-        //             this.getItems()
-        //             return;
-        //         }
+        sort: {
+            immediate: true,
+            handler: function(to) {
+                if (!to) {
+                    this.internalSort = {
+                        field: this.fields[0],
+                        desc: false
+                    }
+                    this.getItems()
+                    return;
+                }
 
-        //         this.realSort = {
-        //             field: this.fields.find(i => i.name == to.field),
-        //             desc: to.desc
-        //         }
-        //         this.resetCurrentPage();
-        //         this.getItems()
-        //     }
-        // },
+                this.internalSort = {
+                    field: this.fields.find(f => f.name == to.field),
+                    desc: to.desc
+                }
+                this.resetCurrentPage();
+                this.getItems()
+            }
+        },
         filterTerm() {
             this.getItems();
         },
@@ -225,19 +204,19 @@ export default {
             return this.filter ? this.filter : this.defaultFilter;
         },
         sortField() {
-            return this.sort.field;
+            return this.internalSort.field;
         },
         sortFieldName() {
-            if (this.sort.field.sortName) {
-                return this.sort.field.sortName
+            if (this.internalSort.field.sortName) {
+                return this.internalSort.field.sortName
             }
-            return this.sort.field.Name;
+            return this.internalSort.field.name;
         }
     },
     methods: {
         async getItems () {
             if (this.dataIsFunction) {
-                this.resolvedItems = await this.data(this.currentPage, this.pageSize, this.sort, this.setTotalItems);
+                this.resolvedItems = await this.data(this.currentPage, this.pageSize, this.internalSort, this.setTotalItems);
                 return;
             }
 
@@ -265,16 +244,16 @@ export default {
             return data.slice(startIndex, endIndex);
         },
         sortData (data) {
-            const sortType = this.sort.field.type || String;
+            const sortType = this.internalSort.field.type || String;
 
             if (this.dataIsFunction) {
                 this.getItems();
                 return;
             }
 
-            if (this.sort.field.sortFunction) {
-                const sorted = data.sort(this.sort.field.sortFunction)
-                if (this.sort.desc) {
+            if (this.internalSort.field.sortFunction) {
+                const sorted = data.sort(this.internalSort.field.sortFunction)
+                if (this.internalSort.desc) {
                     return sorted.reverse();
                 }
 
@@ -343,31 +322,42 @@ export default {
         },
         
         updateSort(field) {
-            const oldField = this.sort.field;
-            const newSort = {
+            const oldField = this.internalSort.field;
+            this.internalSort = {
                 field: field,
-                desc: !this.sort.desc
+                desc: !this.internalSort.desc
             }
 
             if (oldField.name != field.name) {
-                newSort.desc = false
+                this.internalSort.desc = false
             }
 
-            this.$emit('update:sort', newSort)
-            this.$emit('sorted', newSort);
+            this.$emit('update:sort', {field: this.internalSort.field.name, desc: this.internalSort.desc})
+            this.$emit('sorted', {field: this.internalSort.field.name, desc: this.internalSort.desc});
 
             this.$nextTick(() => {
                 this.getItems();
             })
         },
         textAndNumberSort(a, b) {
-            const coefficient = this.sort.desc ? -1 : 1;
+            const coefficient = this.internalSort.desc ? -1 : 1;
             let aVal = this.resolveSortAttribute(a, this.sortField);
             let bVal = this.resolveSortAttribute(b, this.sortField);
-            if (this.sort.field.type == String && aVal !== null && bVal !== null) {
-                aVal = aVal.toLowerCase();
-                bVal = bVal.toLowerCase();
+
+            // Handle cases where operand is null
+            if (aVal && !bVal) {
+                return -1 * coefficient;
             }
+            if (bVal && !aVal) {
+                return 1 * coefficient;
+            }
+
+            // Normalize strings
+            if (this.internalSort.field.type == String || (typeof aVal == 'string' && typeof bVal == 'string')) {
+                aVal = aVal ? aVal.toLowerCase() : aVal;
+                bVal = bVal ? bVal.toLowerCase() : bVal;
+            }
+
             if (aVal == bVal) {
                 if (a.id > b.id) {
                     return 1*coefficient;
@@ -377,7 +367,7 @@ export default {
             return coefficient*((aVal > bVal) ? 1 : -1);
         },
         dateSort(a, b) {
-            const coefficient = this.sort.desc ? -1 : 1;
+            const coefficient = this.internalSort.desc ? -1 : 1;
 
             let aVal = Date.parse(this.resolveSortAttribute(a, this.sortField));
             if (isNaN(parseFloat(aVal))) {
@@ -429,7 +419,7 @@ export default {
                 classes.push('cursor-pointer underline hover:bg-gray-300');
             }
             if (field.colspan == 1) {
-                if (this.sort.field == field) {
+                if (this.internalSort.field == field) {
                     classes.push(field)
                 }
             }
@@ -464,3 +454,24 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+    table {
+        @apply w-full;
+    }
+    tbody{
+        @apply bg-white odd:bg-gray-100 border-0 hover:border-blue-300 hover:bg-blue-100
+    }
+    tr > th {
+        @apply text-left border border-gray-300 px-3
+    }
+    tr:not(.details) > td {
+        @apply text-left p-1 px-3 border align-top;
+    }
+    tr.details > td {
+        @apply border-none p-0;
+    }
+    th.sorted, td.sorted  {
+        @apply bg-blue-100 hover:bg-blue-100
+    }
+</style>

@@ -1,6 +1,7 @@
 <script setup>
     import { ref } from 'vue'
     import {useRouter} from 'vue-router'
+    import setupRouterSortAndFilter from '@/composables/router_aware_sort_and_filter.js'
 
     const tableFields = [
         { name: 'assay_classes',
@@ -17,21 +18,32 @@
         },
         { name: 'affiliation_id',
             label: 'Affiliation',
-            sortable: true
+            sortable: true,
+            type: String
         },
         { name: 'publication.name',
             label: 'Publication',
             resolveValue (item) {
                 return item.publication.name
             },
-            sortable: true
+            sortable: true,
+            type: String
         },
-        { name: 'approved', resolveValue (item) { return item.approved ? 'Yes' : 'No '} },
+        { 
+            name: 'approved', 
+            resolveValue (item) { return item.approved ? 'Yes' : 'No '},
+            resolveSort (item) {
+                const numericVal = item.approved ? 1 : 2;
+                // console.log(numericVal);
+                return numericVal;
+            },
+            sortable: true,
+            type: Number
+        },
     ];
 
-    const filter = ref();
-    const sort = ref({
-        field: tableFields[0],
+    const {sort, filter} = setupRouterSortAndFilter({
+        field: tableFields[0].name,
         desc: false
     })
 
