@@ -1,5 +1,5 @@
 <script setup>
-    import {ref, onMounted} from 'vue'
+    import { computed, ref, onMounted } from 'vue'
     import {api} from '@/http.js'
 
     const props  = defineProps({
@@ -26,6 +26,27 @@
     })
 
     const items = ref([]);
+    const filterTerm = ref();
+    const filteredItems = computed(() => {
+        if (!filterTerm.value) return items.value;
+
+        return items.value.filter(item => {
+            for (let key in item) {
+                const val = item[key];
+                const lowerTerm = filterTerm.value.toLowerCase();
+                if (typeof val == 'string' && val.toLowerCase().includes(lowerTerm)) {
+                    return true
+                }
+                if (typeof val == 'number' && val == filterTerm.value) {
+                    return true
+                }
+
+                continue;
+            }
+            
+            return false;
+        })
+    })
 
     const buildEditRoute = (item) => {
         return {
@@ -54,7 +75,8 @@
     <div>
 
         <slot :items="items">
-            <item-list :items="items">
+            <InputRow label="Filter" v-model="filterTerm" labelWidthClass="w-auto pr-2" class="border-b pb-4 mb-4 " />
+            <item-list :items="filteredItems">
                 <template v-slot="item">
                     <div class="flex py-2 w-full border-b justify-between">
                         <div>
