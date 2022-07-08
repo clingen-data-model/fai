@@ -281,7 +281,7 @@ class ImportFdData
     private function getAttribute($attribute, $data)
     {
         if (array_key_exists($attribute, $data)) {
-            return $data[$attribute];
+            return $data[$attribute] ? trim($data[$attribute]) : $data[$attribute];
         }
 
         return null;
