@@ -129,9 +129,9 @@ export default {
             return this.selections.length > 0
         },
         filteredUniqueOptions () {
-            const selectionIds = this.selections.map(s => s.value);
+            const selectionIds = this.selections.map(s => s[this.keyOptionsBy]);
             return this.filteredOptions
-                    .filter(i => !selectionIds.includes(i.value))
+                    .filter(i => !selectionIds.includes(i[this.keyOptionsBy]))
         }
     },
     watch: {
@@ -151,7 +151,6 @@ export default {
     },
     methods: {
         handleInputFocus () {
-            console.log('handleInputFocus', this.showOptionsOnFocus)
             this.hasFocus = true;
             if (this.showOptionsOnFocus) {
                 this.search(this.searchText, this.options);
@@ -334,7 +333,6 @@ export default {
         this.search = debounce( async (searchText, options) => {
             if (searchText == '' || searchText === null || typeof searchText == 'undefined') {
                 if (this.showOptionsOnFocus) {
-                    console.log('show options b/ focus')
                     this.filteredOptions = [...options];
                     return;
                 }
