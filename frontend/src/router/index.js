@@ -165,6 +165,10 @@ const routes = [
         path: '/dev/form-example',
         component: () => import('@/views/dev/FormDefExample.vue'),
     },
+    { name: 'PubMedTest',
+        path: '/dev/pubmed',
+        component: () => import('@/views/dev/PubMedTest.vue'),
+    },
 ];
 
 
