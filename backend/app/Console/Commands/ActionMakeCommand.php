@@ -23,7 +23,7 @@ class ActionMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $signature = 'make:action {name} {--as-controller : Use action as controller.} {--as-command : Use action as command.} {--as-listener=? : Use action as listener.}';
+    protected $signature = 'make:action {name} {--as-controller : Use action as controller.} {--as-command : Use action as command.} {--as-listener= : Use action as listener.}';
     
     protected function getStub()
     {
@@ -67,7 +67,7 @@ class ActionMakeCommand extends GeneratorCommand
                 'use Lorisleiva\Actions\ActionRequest;',
                 'use Lorisleiva\Actions\Concerns\AsController;',
             ];
-            $useTraits = ["\tuse AsController;"];
+            $useTraits = ["use AsController;"];
 
             $replacements['{{ as_controller_methods }}'] = file_get_contents($this->getControllerMethodsStub());
         }
@@ -76,21 +76,20 @@ class ActionMakeCommand extends GeneratorCommand
 
             $useStatements[] = 'use Lorisleiva\Actions\Concerns\AsCommand';
             $useStatements[] = 'use Illumniate\Console\Command';
-            $useTraits[] = "\tuse AsController;";
+            $useTraits[] = "use AsCommand;";
             $replacements['{{ command_signature }}'] = "\t".'$commandSignature = \'command\'';
             $replacements['{{ as_command_methods }}'] = file_get_contents($this->getCommandMethodsStub());
         }
 
-        if ($this->hasOption('as-listener')) {
-            // throw new \Exception('as-listener option is not yet supported.');
+        if ($this->option('as-listener')) {
 
             $useStatements[] = 'use Lorisleiva\Actions\Concerns\AsListener;';
-            $useTraits[] = "\tuse AsListener;";
+            $useTraits[] = "use AsListener;";
             $replacements['{{ event_type }}'] = $this->option('as-listener');
             $replacements['{{ as_listener_methods }}'] = file_get_contents($this->getListenerMethodsStub());
         }
         
-        $replacements['{{ use_statements }}'] = implode("\n", $useStatements);
+        $replacements['{{ use_statements }}'] = implode("\n    ", $useStatements);
         $replacements['{{ use_traits }}'] = implode("\n", $useTraits);
 
         return $replacements;
