@@ -17,7 +17,7 @@ use Lorisleiva\Actions\Concerns\AsCommand;
 
 class ImportFdData
 {
-	use AsCommand;	
+	use AsCommand;
 
     public $commandSignature = 'dev:import';
     private $command;
@@ -31,15 +31,15 @@ class ImportFdData
         if ($this->hasErrors()) {
             dd(array_map(function ($i) { return $i['msg']; }, $this->errors));
         }
-    }    
+    }
 
     private function importOtherFiles()
     {
         $entries = $this->filesInDir(base_path('import-data'));
         $jsonFiles  = $this->filterPaths(
                             $entries,
-                            function ($file) { 
-                                return preg_match('/(?<!(functionalassays))\.json$/', $file); 
+                            function ($file) {
+                                return preg_match('/(?<!(functionalassays))\.json$/', $file);
                             }
                         );
         $rawData = $this->parseFiles($jsonFiles);
@@ -48,36 +48,27 @@ class ImportFdData
             $fas = $fa;
         }
         $this->command->info(count($fas).' created');
-
-        
-        // $faGenerator = $this->createFunctionalAssays($functionalAssays);
-        
-        // $faModels = [];
-        // foreach ($faGenerator as $faModel) {
-        //     $faModels[] = $faModel;
-        // }
-        // $this->command->info(count($faModels).' created');
     }
-    
+
     private function importGeneFiles()
     {
         $entries = $this->filesInDir(base_path('import-data'));
         $jsonFiles  = $this->filterPaths(
-                            $entries, 
-                            function ($file) { 
-                                return preg_match('/.json$/', $file); 
+                            $entries,
+                            function ($file) {
+                                return preg_match('/.json$/', $file);
                             }
                         );
         $functionalAssays = $this->parseFiles($jsonFiles);
         $faGenerator = $this->createFunctionalAssays($functionalAssays);
-        
+
         $faModels = [];
         foreach ($faGenerator as $faModel) {
             $faModels[] = $faModel;
         }
         $this->command->info(count($faModels).' created');
     }
-    
+
 
     public function asCommand(Command $command)
     {
@@ -114,14 +105,14 @@ class ImportFdData
         foreach ($paths as $path) {
             $count++;
             $parts = explode('-', array_reverse(explode('/', $path))[0]);
-            
+
             $geneSymbol = null;
             $hgncId = null;
             if (count($parts) > 1) {
                 $geneSymbol = $parts[0];
                 $hgncId = $parts[1];
             }
-            
+
             $doc = json_decode(file_get_contents($path), true);
             $functionalAssays = $this->parseDocument($doc);
             foreach ($functionalAssays as $funcAss) {
@@ -130,8 +121,8 @@ class ImportFdData
                 $funcAss['Affiliation ID'] = $count;
 
                 $rawImport = $this->storeRawImport(
-                    data: $funcAss, 
-                    geneSymbol: $geneSymbol, 
+                    data: $funcAss,
+                    geneSymbol: $geneSymbol,
                     assayClassName: $funcAss['Assay Class'],
                     affiliationId: $count
                 );
@@ -140,7 +131,7 @@ class ImportFdData
 
                 yield $funcAss;
             }
-            
+
         }
     }
 
@@ -153,7 +144,7 @@ class ImportFdData
             }
         }
     }
-    
+
     private function storeRawImport($data, $assayClassName, $geneSymbol, $affiliationId)
     {
 
@@ -172,19 +163,22 @@ class ImportFdData
         foreach ($items as $fa) {
             try {
                 $assayClass = AssayClass::firstOrCreate(['name' => $this->getAttribute('Assay Class', $fa)]);
-                
+
+                $code = trim(preg_replace('/PMID:\s*?/', '', $this->getAttribute('PMID', $fa)));
+                $code = preg_replace('/[^(\x20-\x7F)\x0A\x0D]*/','', $code);
+
                 $publication = Publication::firstOrCreate(
-                                    ['coding_system_id' => 1, 'code' => $this->getAttribute('PMID', $fa)],
+                                    ['coding_system_id' => 1, 'code' => $code],
                                     [
-                                        'coding_system_id' => 1, 
-                                        'code' => $this->getAttribute('PMID', $fa),
+                                        'coding_system_id' => 1,
+                                        'code' => $code,
                                         'doi' => $this->getAttribute('DOI / link', $fa),
                                         'author' => $this->getAuthor($fa),
                                         'year' => $this->getAttribute('Year', $fa)
                                     ]
                                 );
                 $data = array_merge(
-                    ['publication_id' => $publication->id], 
+                    ['publication_id' => $publication->id],
                     $this->mapData($fa)
                 );
 
@@ -222,7 +216,7 @@ class ImportFdData
             'raw_import_id' => $this->getAttribute('raw_import_id', $raw)
         ];
     }
-    
+
     private function getApproved($data)
     {
         if (isset($data['Approved assay (y/n)'])) {
@@ -231,13 +225,13 @@ class ImportFdData
 
         return false;
     }
-    
+
     private function getRangeType($data)
     {
         $value = $this->getAttribute("Readout type (qualitative/quantitative)", $data);
         return $value ? strtolower($value) : null;
     }
-    
+
     private function getMaterialUsed($fa)
     {
         if (isset($fa["Material used (patient cells, engineered variants, cell lines, animal model, etc."])) {
@@ -251,7 +245,7 @@ class ImportFdData
         return null;
 
     }
-    
+
     private function getAuthor($fa)
     {
         if (isset($fa['Author'])) {
@@ -277,7 +271,7 @@ class ImportFdData
 
         return null;
     }
-    
+
     private function getAttribute($attribute, $data)
     {
         if (array_key_exists($attribute, $data)) {
