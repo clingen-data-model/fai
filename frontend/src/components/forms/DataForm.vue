@@ -1,7 +1,9 @@
 <script setup>
-    import {ref, onBeforeUpdate, h} from 'vue'
+    import {ref, onBeforeUpdate, h, onUpdated} from 'vue'
     import DataFormField from '@/components/forms/DataFormField.vue'
+    import DataFormSection from './DataFormSection.vue'
     import mirror from '@/composables/setup_working_mirror'
+    import {titleCase} from '@/utils'
     import {v4 as uuid4} from 'uuid'
 
     const props = defineProps({
@@ -44,16 +46,17 @@
     const renderElement = ({field, modelValue}) => {
         if (field.type == 'raw-component') {
             return h(
-                field.component.component, 
-                field.component.options, 
+                field.component.component,
+                field.component.options,
                 field.component.slots
             );
         }
+
         return h(
-            DataFormField, 
+            DataFormField,
             {
-                field: field, 
-                modelValue: workingCopy.value, 
+                field: field,
+                modelValue: workingCopy.value,
                 'onUpdate:modelValue': (value) => {
                     emits('update:modelValue', value)
                 },
@@ -68,10 +71,10 @@
             let extraSlot = null;
             if (field.extraSlot) {
                 extraSlot = h(
-                    field.extraSlot, 
+                    field.extraSlot,
                     {
-                        field: field, 
-                        modelValue: workingCopy.value, 
+                        field: field,
+                        modelValue: workingCopy.value,
                         'onUpdate:modelValue': (value) => {
                             emits('update:modelValue', value)
                         }
@@ -80,17 +83,65 @@
             }
         return extraSlot;
     }
-    
+
+    const showOptional = ref(true)
+    const toggleOptional = () => {
+        showOptional.value = !showOptional.value
+    }
+
+    const showField = (field) => {
+        if (showOptional.value) {
+            return true;
+        }
+
+        if (field.required) {
+            return true;
+        }
+
+        return false;
+    }
+
 </script>
 <template>
-    
-    <!-- <render /> -->
+
     <div class="data-form">
+        <div class="flex flex-row-reverse justify-between items-center mb-4">
+            <button class="xs" @click="toggleOptional">{{showOptional ? 'Hide' : 'Show'}} Optional</button>
+            <static-alert class="text-xs" variant="warning" v-show="!showOptional">
+                Only showing <strong>required</strong> fields.
+                <button class="link" @click="toggleOptional">Show all fields</button>
+            </static-alert>
+        </div>
         <div v-for="field in fields" :key="field.name">
-            <div :class="wrapperClass">
-                <renderElement :field="field" :modelValue="workingCopy" />
+            <DataFormSection v-if="field.type == 'section'" :section="field">
+                <div v-for="sectionField in field.contents.filter(f => !f.hidden)" :key="sectionField.name">
+                    <div :class="wrapperClass" class="flex space-x-2 items-start" v-show="showField(sectionField)">
+                        <renderElement :field="sectionField" :modelValue="workingCopy" />
+                        <renderExtra :field="sectionField" :modelValue="workingCopy" />
+                    </div>
+                </div>
+            </DataFormSection>
+            <section :class="wrapperClass" v-else-if="!field.hidden">
+                <renderElement :field="field" :modelValue="workingCopy" v-show="showField(field)"/>
                 <renderExtra :field="field" :modelValue="workingCopy" />
-            </div>
+            </section>
         </div>
     </div>
 </template>
+
+<style scoped>
+    .data-form {
+        @apply bg-gray-100 p-4;
+    }
+    .data-form section,
+    .data-form .input-row {
+        @apply mb-4 bg-white p-4 border-b;
+    }
+    .data-form section > header {
+        @apply pb-2 mb-2 border-b;
+        @apply flex justify-between items-center;
+    }
+    .data-form section > .body {
+        @apply pt-2
+    }
+</style>

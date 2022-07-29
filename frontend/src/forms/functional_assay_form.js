@@ -20,91 +20,129 @@ const loadPublications = async () => {
 }
 
 export const fields = ref([
-    { 
-        name: 'publication_id',
-        label: 'Publication',
-        type: 'component',
-        component: {
-            component: markRaw(SearchSelect),
-            options: {
-                options: publicationOptions,
-                labelField: 'name',
-                showOptionsOnFocus: true,
+    {
+        type: 'section',
+        name: 'basic-info',
+        label: 'Basic Information',
+        contents: [
+            { name: 'affiliation_id',
+                type: 'number',
+                required: true
             },
-            slots: {
-                additionalOption: () => {
-                    return h('a', { href: `#create-publication`, innerHTML: 'Create new Publication', class: 'btn xs' })
-                } 
-            }
-        },
-        required: true,
-    },
-    { 
-        name: 'assay_class_ids', 
-        label: 'Assay Classes',
-        type: 'component', 
-        component: {
-            component: markRaw(SearchSelect),
-            options: {
-                options: assayClassOptions,
-                labelField: 'name',
-                showOptionsOnFocus: true,
-                multiple: true
+            { name: 'hgnc_id',
+                label: 'Gene',
+                placeholder: 'HGNC:1234',
+                required: true
             },
-            slots: {
-                additionalOption: () =>  h(
-                    'a', 
-                    { href: `#create-assay-class`, innerHTML: 'Create new Assay Class', class: 'btn xs' } 
-                )
-            }
-        },
-        required: true
-    },
-    { name: 'affiliation_id', type: 'number'},
-    { name: 'hgnc_id',
-        label: 'Gene',
-        placeholder: 'HGNC:1234',
-        required: true
-    },
-    { 
-        name: 'approved', 
-        type: 'radio-group',
-        options: [
-            {label: 'Yes', value: 1},
-            {label: 'No', value: 0},
+            {
+                name: 'assay_class_ids',
+                label: 'Assay Classes',
+                type: 'component',
+                component: {
+                    component: markRaw(SearchSelect),
+                    options: {
+                        options: assayClassOptions,
+                        labelField: 'name',
+                        showOptionsOnFocus: true,
+                        multiple: true
+                    },
+                    slots: {
+                        additionalOption: () =>  h(
+                            'a',
+                            { href: `#create-assay-class`, innerHTML: 'Create new Assay Class', class: 'btn xs' }
+                        )
+                    }
+                },
+                required: true
+            },
+            {
+                name: 'publication_id',
+                label: 'Publication',
+                type: 'component',
+                component: {
+                    component: markRaw(SearchSelect),
+                    options: {
+                        options: publicationOptions,
+                        labelField: 'name',
+                        showOptionsOnFocus: true,
+                    },
+                    slots: {
+                        additionalOption: () => {
+                            return h('a', { href: `#create-publication`, innerHTML: 'Create new Publication', class: 'btn xs' })
+                        }
+                    }
+                },
+                required: true,
+            },
+            {
+                name: 'approved',
+                type: 'select',
+                options: [
+                    {label: 'Yes', value: 1},
+                    {label: 'No', value: 0},
+                ]
+            },
+            { name: 'description', type: 'large-text' },
+            { name: 'material_used', type: 'large-text' },
+            { name: 'patient_derived_material_used', type: 'large-text' },
         ]
     },
-    { name: 'material_used', type: 'large-text' },
-    { name: 'patient_derived_material_used', type: 'large-text' },
-    { name: 'description', type: 'large-text' },
-    { name: 'read_out_description', type: 'large-text' },
-    { name: 'range_type', type:'select', options: ['qualitative', 'quantitative'], required: true },
-    { name: 'range' },
-    { name: 'normal_range' },
-    { name: 'abnormal_range'},
-    { name: 'indeterminate_range'},
-    { name: 'validation_control_pathogenic'},
-    { name: 'validation_control_benign'},
-    { 
-        name: 'replication', 
-        type: 'large-text', 
-        required: true
+    {
+        type: 'section',
+        name: 'read-out',
+        contents: [
+            { name: 'read_out_description', type: 'large-text' },
+            { name: 'units' },
+            { name: 'range_type', type:'select', options: ['qualitative', 'quantitative'], required: true },
+            { name: 'range' },
+            { name: 'normal_range' },
+            { name: 'abnormal_range'},
+            { name: 'indeterminate_range'},
+        ]
     },
-    { 
-        name: 'statistical_analysis_description', 
-        type: 'large-text', 
-        required: true
+    {
+        type: 'section',
+        name: 'validation-countrols',
+        contents: [
+            { name: 'validation_control_pathogenic'},
+            { name: 'validation_control_benign'},
+        ]
     },
-    { name: 'significance_threshold' },
-    { name: 'comment', type: 'large-text'},
-    { name: 'units' },
-    { name: 'field_notes', type: 'large-text', class: "hidden" },
+    {
+        type: 'section',
+        name: 'statistical-analysis',
+        contents: [
+            {
+                name: 'replication',
+                type: 'large-text',
+                required: true
+            },
+            {
+                name: 'statistical_analysis_description',
+                type: 'large-text',
+                required: true
+            },
+            { name: 'significance_threshold' },
+            { name: 'comment', type: 'large-text'},
+        ]
+    },
+    { name: 'field_notes', type: 'large-text', hidden: true },
     { name: 'assay_notes', type: 'large-text'}
 ]);
 
-Object.keys(fields.value).forEach(fieldKey => {
-    fields.value[fieldKey].extraSlot = markRaw(FunctionalAssayFieldNoteInput)
-})
+const addNoteFields = fields => {
+    Object.keys(fields).forEach(fieldKey => {
+        const field = fields[fieldKey];
+        if (field.hidden) return;
+        if (field.type == 'section') {
+            addNoteFields(field.contents)
+            return;
+        }
+        field.extraSlot = markRaw(FunctionalAssayFieldNoteInput)
+    })
+}
+
+addNoteFields(fields.value);
 
 loadAssayClasses();
 loadPublications();
@@ -122,7 +160,7 @@ export class FunctionalAssayForm extends BaseEntityForm
 
     async save (data) {
         data = this.prepareDataForStore(data)
-        return super.save(data); 
+        return super.save(data);
     }
 
     async update(data) {
@@ -133,8 +171,8 @@ export class FunctionalAssayForm extends BaseEntityForm
     prepareDataForStore (data) {
         const clone = {...data}
         clone.assay_class_ids = clone.assay_class_ids ? clone.assay_class_ids.map(ac => ac.id) : undefined;
-        clone.publication_id =  clone.publication_id 
-                                ? clone.publication_id.id 
+        clone.publication_id =  clone.publication_id
+                                ? clone.publication_id.id
                                 : clone.publciation_id;
         return clone;
     }
@@ -155,12 +193,12 @@ export class FunctionalAssayForm extends BaseEntityForm
     }
 
     loadAssayClasses () {
-        loadAssayClasses()    
+        loadAssayClasses()
     }
     loadPublications () {
-        loadPublications()    
+        loadPublications()
     }
-    
+
 }
 
 export default (new FunctionalAssayForm())

@@ -87,7 +87,7 @@
             errors: props.errors[props.field.name],
             options: resolveOptions(props.field),
             vertical: props.field.vertical,
-            class: props.field.class,
+            class: (props.field.class || '') + (props.field.required ? 'required' : ''),
             required: props.field.required,
         }
         return h( InputRowVue, options, defaultSlotFunction)
@@ -100,7 +100,7 @@
                 modelValue: fieldValue.value,
                 'onUpdate:modelValue': (value) => { fieldValue.value = value },
             }
-            
+
             return h(props.field.component.component, options,  props.field.component.slots)
         }
         return renderInputRow(renderComponent)
@@ -108,8 +108,8 @@
 
     const render = () => {
         const children = renderChildren()
-        const container = h('div', {class: ''}, evalShow(props.field) ? children : []);
-        
+        const container = h('div', {class: '', id: `${props.field.name}-container`}, evalShow(props.field) ? children : []);
+
         return container
     }
 

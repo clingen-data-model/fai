@@ -3,6 +3,7 @@
     import {ref, computed} from 'vue'
     import {setupMirror, mirrorProps, mirrorEmits} from '@/composables/setup_working_mirror'
     import utils from '@/utils.js'
+    import FunctionalAssayNoteView from '../FunctionalAssayNoteView.vue'
 
     const props = defineProps({
         ...mirrorProps,
@@ -25,6 +26,11 @@
             return val;
         },
         set (value) {
+            // init the field_notes object if not set.
+            if (!workingCopy.value.field_notes) {
+                workingCopy.value.field_notes = {}
+            }
+
             if (get(workingCopy.value.field_notes, props.field.name) !== value) {
                 set(workingCopy.value.field_notes, props.field.name, value);
 
@@ -63,6 +69,12 @@
                 <textarea v-model="fieldNoteValue" class="w-full h-40"></textarea>
                 <button @click="endEdit">OK</button>
             </ModalDialog>
+        </teleport>
+        <teleport :to="`#${field.name}-container`" v-if="fieldNoteValue">
+            <FunctionalAssayNoteView
+                v-if="fieldNoteValue"
+                :fieldNotes="workingCopy.field_notes"
+                :fieldName="field.name" class="sm:ml-36" />
         </teleport>
     </div>
 </template>

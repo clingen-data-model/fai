@@ -1,6 +1,6 @@
 <template>
-    <div 
-        :class="{'border-l border-red-800 px-2': hasErrors}" 
+    <div
+        :class="{'border-l border-red-800 px-2': hasErrors}"
         class="input-row"
     >
         <div :class="{'sm:flex': !vertical}">
@@ -14,10 +14,10 @@
             </div>
             <div class="flex-grow">
                 <slot>
-                    <date-input 
+                    <date-input
                         v-if="type == 'date'"
-                        :modelValue="modelValue" 
-                        @update:modelValue="emitValue" 
+                        :modelValue="modelValue"
+                        @update:modelValue="emitValue"
                         :disabled="disabled"
                         :readonly="$attrs.readonly"
                         @change="$emit('change', modelValue)"
@@ -25,9 +25,9 @@
                         :name="name"
                         :class="inputClass"
                     ></date-input>
-                    <textarea 
+                    <textarea
                         v-else-if="type == 'large-text'"
-                        :value="modelValue" 
+                        :value="modelValue"
                         @input="$emit('update:modelValue', $event.target.value)"
                         :disabled="disabled"
                         :readonly="$attrs.readonly"
@@ -39,17 +39,17 @@
                         rows="5"
                         :placeholder="placeholder"
                     ></textarea>
-                    <div 
+                    <div
                         v-else-if="type == 'radio-group'"
                         class="radio-group"
                         :class="{'ml-4': vertical}"
                     >
-                        <radio-button 
+                        <radio-button
                             v-for="option in options"
                             :key="option.value"
-                            :modelValue="modelValue" 
-                            @update:modelValue="emitValue" 
-                            :label="option.label || sentenceCase(option.value)" 
+                            :modelValue="modelValue"
+                            @update:modelValue="emitValue"
+                            :label="option.label || sentenceCase(option.value)"
                             :value="option.value"
                             :disabled="disabled"
                             :readonly="$attrs.readonly"
@@ -61,6 +61,7 @@
                         v-bind="$attrs.disabled"
                         :disabled="disabled"
                         :readonly="$attrs.readonly"
+                        class="w-full"
                     >
                         <option value="">Select&hellip;</option>
                         <template v-for="option in options" :key="option.value">
@@ -74,16 +75,17 @@
                             </slot>
                         </template>
                     </select>
-                    <input 
+                    <input
                         v-else
-                        :type="type" 
-                        :value="modelValue" 
+                        :type="type"
+                        :value="modelValue"
                         @input="$emit('update:modelValue', $event.target.value)"
                         :placeholder="placeholder"
                         :disabled="disabled"
                         :readonly="$attrs.readonly"
                         @change="$emit('change', $event.target.value)"
                         ref="input"
+                        class="w-full"
                         :class="inputClass"
                         :name="name"
                     >
@@ -180,7 +182,7 @@ export default {
             if (this.label && [':',';','.','?', '!'].includes(this.label.substr(-1))) {
                 return '';
             }
-            return ':';    
+            return ':';
         },
         hasErrors () {
             return this.errors.length > 0;

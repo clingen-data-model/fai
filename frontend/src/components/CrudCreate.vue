@@ -39,7 +39,7 @@
 
 <template>
     <div>
-        <DataForm :fields="fields" :errors="errors" v-model="currentItem" />
+        <DataForm :fields="fields" :errors="errors" v-model="currentItem" wrapperClass="my-2 flex space-x-2 items-start"/>
         <ButtonRow submit-text="Save" @submitted="handleSubmission" @cancel="handleCancel" />
     </div>
 </template>

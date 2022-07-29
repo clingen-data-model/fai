@@ -42,7 +42,7 @@
 </script>
 <template>
     <div>
-        <DataForm :fields="fields" :errors="errors" v-model="currentItem" />
+        <DataForm :fields="fields" :errors="errors" v-model="currentItem" wrapperClass="my-2" />
         <button-row submit-text="Update" @click="handleSubmission" @cancel="handleCancel"></button-row>
     </div>
 </template>

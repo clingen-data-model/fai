@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import App from '@/App.vue'
 import router from '@/router/index.js'
 import '@/assets/app.css'
+import '@/assets/transitions.css'
 import objectUid from '@/object_uid'
 import "./assets/popper-theme.css"
 
@@ -25,7 +26,7 @@ import RemainingHeight from '@/directives/remaining_height'
 app.directive('remaining-height', RemainingHeight)
 
 import PopOver from "@/components/PopOver.vue"
-app.component('popper', PopOver);  
+app.component('popper', PopOver);
 app.component('popover', PopOver);
 
 
@@ -34,7 +35,7 @@ import {titleCase, camelCase, snakeCase, kebabCase, sentenceCase} from '@/utils'
 
 app.config.globalProperties.append = (path, pathToAppend) =>
   path + (path.endsWith('/') ? '' : '/') + pathToAppend
-  
+
 app.mixin({
         methods: {
             formatDate,

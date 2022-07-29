@@ -47,7 +47,7 @@ a, button.link {
     }
 }
 
-.note, 
+.note,
 a.note {
     @apply text-xs text-gray-600
 }

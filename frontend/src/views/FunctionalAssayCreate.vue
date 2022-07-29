@@ -40,16 +40,16 @@ import {api} from '../http'
         </template>
 
         <div class="flex space-x-8">
-            <CrudCreate :formDef="formDefinition" class="w-1/2"></CrudCreate>
-            <div class="w-1/2 border-l pl-8" v-if="rawImportId">
+            <CrudCreate :formDef="formDefinition" class="w-full lg:w-1/2"></CrudCreate>
+            <!-- <div class="w-1/2 border-l pl-8" v-if="rawImportId">
                 <h3>Raw Imported Data</h3>
                 <ObjectDictionary :obj="rawImport.data" labelClass="font-bold" vertical />
-            </div>
+            </div> -->
         </div>
 
-        <teleport to='body'> 
-            <AssayClassCreateDialog 
-                @saved="formDefinition.loadAssayClasses()" 
+        <teleport to='body'>
+            <AssayClassCreateDialog
+                @saved="formDefinition.loadAssayClasses()"
                 v-model="hashData['create-assay-class']"
              />
              <PublicationCreateDialog
