@@ -20,8 +20,9 @@ return new class extends Migration
 
         Schema::table('publications', function (Blueprint $table) {
             $table->text('title')->change();
+            $table->index('title(250)');
         });
-        DB::statement("CREATE INDEX `title_index` on `publications` (title(255))");
+        // DB::statement("CREATE INDEX `title_index` on `publications` (title(255))");
     }
 
     /**

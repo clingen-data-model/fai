@@ -25,7 +25,7 @@ class AssayClassListTest extends TestCase
     {
         $this->makeRequest()
             ->assertStatus(200)
-            ->assertJson($this->assayClasses->toArray());
+            ->assertJsonCount($this->assayClasses->count());
     }
 
     /**
@@ -42,14 +42,14 @@ class AssayClassListTest extends TestCase
                 $firstClass->toArray()
             ]);
     }
-    
+
 
     private function makeRequest($query = null): TestResponse
     {
         $query = $query ?? [];
         return $this->json('GET', '/api/assay-classes', $query);
     }
-    
-    
-    
+
+
+
 }

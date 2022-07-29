@@ -44,6 +44,7 @@ class FunctionalAssay extends Model
         'ep_proposed_strength_pathogenic',
         'ep_propsed_strength_benign',
         'raw_import_id',
+        'validated_at'
     ];
 
     public $casts = [
@@ -51,9 +52,10 @@ class FunctionalAssay extends Model
         'publication_id' => 'integer',
         'raw_import_id' => 'integer',
         'approved' => 'boolean',
-        'field_notes' => 'array'
+        'field_notes' => 'array',
+        'validated_at' => 'datetime',
     ];
-    
+
     /**
      * The assayClasses that belong to the FunctionalAssay
      *
@@ -83,4 +85,17 @@ class FunctionalAssay extends Model
     {
         return $this->hasMany(Snapshot::class);
     }
+
+    //SCOPE
+    public function scopeIsValidated($query)
+    {
+        return $query->whereNotNull('validated_at');
+    }
+
+    public function scopeNeedsValidation($query)
+    {
+        return $query->whereNull('validated_at');
+    }
+
+
 }

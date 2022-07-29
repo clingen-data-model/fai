@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\End2End;
 
+use Carbon\Carbon;
 use Tests\Feature\End2End\TestCase;
 use App\Events\FunctionalAssaySaved;
 use Illuminate\Testing\TestResponse;
@@ -19,9 +20,9 @@ class FunctionalAssayCreateTest extends TestCase
     public function setup():void
     {
         parent::setup();
-        $this->createAssayClass();    
+        $this->createAssayClass();
     }
-    
+
 
     /**
      * @test
@@ -35,9 +36,25 @@ class FunctionalAssayCreateTest extends TestCase
             ->assertStatus(201)
             ->assertJson($expected);
 
-        
+
         $this->assertDatabaseHas('functional_assays', $this->jsonifyArrays($expected));
     }
+
+    /**
+     * @test
+     */
+    public function sets_validated_at_if_validated()
+    {
+        Carbon::setTestNow('2022-07-29');
+
+        $this->makeRequest()
+            ->assertStatus(201);
+
+        $this->assertDatabaseHas('functional_assays', [
+            'validated_at' => Carbon::now()
+        ]);
+    }
+
 
     /**
      * @test
@@ -68,7 +85,7 @@ class FunctionalAssayCreateTest extends TestCase
             'approved' => 'blah',
             'material_used' => 'blah',
             'patient_derived_material_used' => 'blah',
-            
+
             'range' => str_repeat("X", 256),
             'normal_range' => str_repeat("X", 256),
             'abnormal_range' => str_repeat("X", 256),
@@ -98,10 +115,10 @@ class FunctionalAssayCreateTest extends TestCase
             'units' => 'This must not be greater than 255 characters.',
             'ep_proposed_strength_pathogenic' => 'This must not be greater than 255 characters.',
             'ep_propsed_strength_benign' => 'This must not be greater than 255 characters.',
-            
+
         ]);
     }
-    
+
     /**
      * @test
      */
@@ -131,8 +148,8 @@ class FunctionalAssayCreateTest extends TestCase
             return $event->functionalAssay->hgnc_id == 'HGNC:12345';
         });
     }
-    
-    
+
+
 
     private function makeRequest($data = null): TestResponse
     {
@@ -140,5 +157,5 @@ class FunctionalAssayCreateTest extends TestCase
 
         return $this->json('POST', '/api/functional-assays', $data);
     }
-    
+
 }

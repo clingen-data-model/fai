@@ -6,6 +6,7 @@ use Illuminate\Validation\Rule;
 use App\Events\FunctionalAssaySaved;
 use Lorisleiva\Actions\ActionRequest;
 use App\Events\FunctionalAssayCreated;
+use Carbon\Carbon;
 use Lorisleiva\Actions\Concerns\AsController;
 
 class FunctionalAssayCreate
@@ -19,16 +20,17 @@ class FunctionalAssayCreate
             $funcAssay->assayClasses()
                 ->attach($id);
         }
-        
+
         event(new FunctionalAssayCreated($funcAssay));
         event(new FunctionalAssaySaved($funcAssay));
-        
+
         return $funcAssay;
     }
 
     public function asController(ActionRequest $request)
     {
         $funcAssayData = $request->safe()->except('assay_class_ids');
+        $funcAssayData['validated_at'] = Carbon::now();
 
         $assayClassIds = $request->safe()->only('assay_class_ids');
         $functionalAssay = $this->handle($funcAssayData, $assayClassIds);

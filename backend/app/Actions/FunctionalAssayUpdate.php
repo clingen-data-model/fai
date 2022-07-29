@@ -7,6 +7,7 @@ use Illuminate\Validation\Rule;
 use App\Events\FunctionalAssaySaved;
 use Lorisleiva\Actions\ActionRequest;
 use App\Events\FunctionalAssayUpdated;
+use Carbon\Carbon;
 use Lorisleiva\Actions\Concerns\AsController;
 
 class FunctionalAssayUpdate
@@ -28,7 +29,10 @@ class FunctionalAssayUpdate
 
     public function asController(ActionRequest $request, FunctionalAssay $functionalAssay)
     {
-        return $this->handle($functionalAssay, $request->validated());
+        $data = $request->validated();
+        $data['validated_at'] = Carbon::now();
+
+        return $this->handle($functionalAssay, $data);
     }
 
     public function rules(ActionRequest $request): array

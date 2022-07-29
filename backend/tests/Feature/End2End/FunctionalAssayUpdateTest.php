@@ -8,6 +8,7 @@ use App\Events\FunctionalAssaySaved;
 use Illuminate\Testing\TestResponse;
 use Illuminate\Support\Facades\Event;
 use App\Events\FunctionalAssayUpdated;
+use Carbon\Carbon;
 use Tests\traits\FunctionalAssayTestHelpers;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -83,7 +84,7 @@ class FunctionalAssayUpdateTest extends TestCase
             'approved' => 'blah',
             'material_used' => 'blah',
             'patient_derived_material_used' => 'blah',
-            
+
             'range' => str_repeat("X", 256),
             'normal_range' => str_repeat("X", 256),
             'abnormal_range' => str_repeat("X", 256),
@@ -109,6 +110,22 @@ class FunctionalAssayUpdateTest extends TestCase
     /**
      * @test
      */
+    public function sets_validated_at_if_validated()
+    {
+        Carbon::setTestNow('2022-07-29');
+
+        $this->makeRequest()
+            ->assertStatus(200);
+
+        $this->assertDatabaseHas('functional_assays', [
+            'id' => $this->functionalAssay->id,
+            'validated_at' => Carbon::now()
+        ]);
+    }
+
+    /**
+     * @test
+     */
     public function fires_functionalAssayUpdated_event()
     {
         Event::fake();
@@ -118,7 +135,7 @@ class FunctionalAssayUpdateTest extends TestCase
 
         Event::assertDispatched(FunctionalAssayUpdated::class);
     }
-    
+
     /**
      * @test
      */
@@ -131,7 +148,7 @@ class FunctionalAssayUpdateTest extends TestCase
 
         Event::assertDispatched(FunctionalAssaySaved::class);
     }
-    
+
 
     private function makeRequest($data = null): TestResponse
     {

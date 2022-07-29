@@ -25,7 +25,8 @@ class FunctionalAssayListTest extends TestCase
     {
         $this->makeRequest()
             ->assertStatus(200)
-            ->assertJson($this->functionalAssays->toArray());
+            ->assertJsonCount($this->functionalAssays->count());
+            // ->assertJson($this->functionalAssays->toArray());
     }
 
     private function makeRequest($query = null): TestResponse
@@ -33,7 +34,7 @@ class FunctionalAssayListTest extends TestCase
         $query = $query ?? [];
         return $this->json('GET', '/api/functional-assays', $query);
     }
-    
-    
-    
+
+
+
 }
