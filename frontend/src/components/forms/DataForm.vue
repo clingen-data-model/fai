@@ -117,7 +117,7 @@
             </static-alert>
         </div>
         <div v-for="field in fields" :key="field.name">
-            <DataFormSection v-if="field.type == 'section'" :section="field">
+            <DataFormSection v-if="field.type == 'section'" :section="field" class="screen-block">
                 <div v-for="sectionField in field.contents.filter(f => !f.hidden)" :key="sectionField.name">
                     <div :class="wrapperClass" class="flex space-x-2 items-start" v-show="showField(sectionField)">
                         <renderElement :field="sectionField" :modelValue="workingCopy" />
@@ -125,7 +125,7 @@
                     </div>
                 </div>
             </DataFormSection>
-            <section :class="wrapperClass" v-else-if="!field.hidden">
+            <section :class="wrapperClass" class="screen-block" v-else-if="!field.hidden">
                 <renderElement :field="field" :modelValue="workingCopy" v-show="showField(field)"/>
                 <renderExtra :field="field" :modelValue="workingCopy" />
             </section>
@@ -136,16 +136,5 @@
 <style scoped>
     .data-form {
         @apply bg-gray-100 p-4;
-    }
-    .data-form section,
-    .data-form .input-row {
-        @apply mb-4 bg-white p-4 border-b;
-    }
-    .data-form section > header {
-        @apply pb-2 mb-2 border-b;
-        @apply flex justify-between items-center;
-    }
-    .data-form section > .body {
-        @apply pt-2
     }
 </style>

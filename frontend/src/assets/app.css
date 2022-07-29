@@ -47,6 +47,10 @@ a, button.link {
     }
 }
 
+.muted {
+    @apply text-gray-400
+}
+
 .note,
 a.note {
     @apply text-xs text-gray-600
@@ -106,4 +110,15 @@ button.yellow
 
 .router-link-active {
     @apply font-bold underline;
+}
+
+.screen-block {
+    @apply mb-4 bg-white p-4 border-b;
+}
+.screen-block > header {
+    @apply pb-2 mb-2 border-b;
+    @apply flex justify-between items-center;
+}
+.screen-block > .body {
+    @apply pt-2
 }
