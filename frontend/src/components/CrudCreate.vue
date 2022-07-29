@@ -1,8 +1,9 @@
 <script setup>
-    import {onUnmounted} from 'vue'
+    import {onUnmounted, useAttrs} from 'vue'
     import {useRouter} from 'vue-router'
 
     const router = useRouter();
+    const attrs = useAttrs();
 
     const props = defineProps({
         formDef: {
@@ -39,7 +40,13 @@
 
 <template>
     <div>
-        <DataForm :fields="fields" :errors="errors" v-model="currentItem" wrapperClass="my-2 flex space-x-2 items-start"/>
+        <DataForm
+            :fields="fields"
+            :errors="errors"
+            v-model="currentItem"
+            wrapperClass="my-2 flex space-x-2 items-start"
+            :hideOptional="attrs.hideOptional"
+        />
         <ButtonRow submit-text="Save" @submitted="handleSubmission" @cancel="handleCancel" />
     </div>
 </template>

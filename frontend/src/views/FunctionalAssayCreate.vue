@@ -40,7 +40,7 @@ import {api} from '../http'
         </template>
 
         <div class="flex space-x-8">
-            <CrudCreate :formDef="formDefinition" class="w-full lg:w-1/2"></CrudCreate>
+            <CrudCreate :formDef="formDefinition" class="w-full lg:w-1/2" :hideOptional="true"></CrudCreate>
             <!-- <div class="w-1/2 border-l pl-8" v-if="rawImportId">
                 <h3>Raw Imported Data</h3>
                 <ObjectDictionary :obj="rawImport.data" labelClass="font-bold" vertical />

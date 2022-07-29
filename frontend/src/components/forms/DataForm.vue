@@ -7,21 +7,25 @@
     import {v4 as uuid4} from 'uuid'
 
     const props = defineProps({
-            ...mirror.props,
-            errors: {
-                type: Object,
-                required: false,
-                default: () => ({})
-            },
-            fields: {
-                type: Array,
-                required: true,
-            },
-            wrapperClass: {
-                type: String || null,
-                default: null
-            }
-        });
+        ...mirror.props,
+        errors: {
+            type: Object,
+            required: false,
+            default: () => ({})
+        },
+        fields: {
+            type: Array,
+            required: true,
+        },
+        wrapperClass: {
+            type: String || null,
+            default: null
+        },
+        hideOptional: {
+            type: Boolean,
+            default: false
+        }
+    });
 
     const emits = defineEmits([...mirror.emits])
     const formId = uuid4()
@@ -105,7 +109,7 @@
 <template>
 
     <div class="data-form">
-        <div class="flex flex-row-reverse justify-between items-center mb-4">
+        <div class="flex flex-row-reverse justify-between items-center mb-4" v-if="hideOptional">
             <button class="xs" @click="toggleOptional">{{showOptional ? 'Hide' : 'Show'}} Optional</button>
             <static-alert class="text-xs" variant="warning" v-show="!showOptional">
                 Only showing <strong>required</strong> fields.
