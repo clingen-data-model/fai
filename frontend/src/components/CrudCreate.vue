@@ -40,21 +40,13 @@
 
 <template>
     <div>
-        <div class="flex space-x-2">
-            <div>
-                <DataForm
-                    :fields="fields"
-                    :errors="errors"
-                    v-model="currentItem"
-                    wrapperClass="my-2 flex space-x-2 items-start"
-                    :hideOptional="attrs.hideOptional"
-                />
-                <ButtonRow submit-text="Save" @submitted="handleSubmission" @cancel="handleCancel" />
-            </div>
-
-            <pre>{{currentItem}}</pre>
-
-
-        </div>
+        <DataForm
+            :fields="fields"
+            :errors="errors"
+            v-model="currentItem"
+            wrapperClass="my-2 flex space-x-2 items-start"
+            :hideOptional="attrs.hideOptional"
+        />
+        <ButtonRow submit-text="Save" @submitted="handleSubmission" @cancel="handleCancel" />
     </div>
 </template>
