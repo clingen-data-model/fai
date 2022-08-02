@@ -1,4 +1,5 @@
-import {ref, markRaw, h} from 'vue'
+import {ref, markRaw, h, cloneVNode} from 'vue'
+import {api} from '@/http.js'
 import BaseEntityForm from "./base_entity_form.js";
 import assayClassRepo from '@/repositories/assay_class_repository.js'
 import pubRepo from '@/repositories/publication_repository.js'
@@ -29,10 +30,29 @@ export const fields = ref([
                 type: 'number',
                 required: true
             },
-            { name: 'hgnc_id',
+            { name: 'gene',
                 label: 'Gene',
                 placeholder: 'HGNC:1234',
-                required: true
+                type: 'component',
+                component: {
+                    component: markRaw(SearchSelect),
+                    options: {
+                        searchFunction: async (searchText) => {
+                            return await api.get('https://gpm.clinicalgenome.org/api/genes/search?query_string='+searchText)
+                                .then(response => {
+                                    return response.data.map(i => ({hgnc_id: i.hgnc_id, gene_symbol: i.gene_symbol}));
+                                });
+                        },
+                        placeholder: 'HGNC ID or Gene Symbol',
+                        keyOptionsBy: 'hgnc_id',
+                        labelField: 'gene_symbol'
+                    },
+                },
+                errorKey: 'hgnc_id',
+                required: true,
+                display: (val) => {
+                    return `${val.gene_symbol} (HGNC:${val.hgnc_id})`
+                }
             },
             {
                 name: 'assay_class_ids',
@@ -53,7 +73,10 @@ export const fields = ref([
                         )
                     }
                 },
-                required: true
+                required: true,
+                display: (val) => {
+                    return val.map(i => i.name).join(', ')
+                }
             },
             {
                 name: 'publication_id',
@@ -73,13 +96,16 @@ export const fields = ref([
                     }
                 },
                 required: true,
+                display: (val) => {
+                    return val.name+' - '+val.author+', '+val.year;
+                }
             },
             {
                 name: 'approved',
                 type: 'select',
                 options: [
-                    {label: 'Yes', value: 1},
-                    {label: 'No', value: 0},
+                    {label: 'Yes', value: true},
+                    {label: 'No', value: false},
                 ]
             },
             { name: 'description', type: 'large-text' },
@@ -154,8 +180,11 @@ export class FunctionalAssayForm extends BaseEntityForm
     }
 
     async find (id) {
+        console.log(id);
         await super.find(id);
         this.currentItem.value = this.prepareLoadedData(this.currentItem.value);
+
+        return this.currentItem.value;
     }
 
     async save (data) {
@@ -174,6 +203,10 @@ export class FunctionalAssayForm extends BaseEntityForm
         clone.publication_id =  clone.publication_id
                                 ? clone.publication_id.id
                                 : clone.publciation_id;
+
+        clone.hgnc_id = 'HGNC:'+clone.gene.hgnc_id;
+        clone.gene_symbol = clone.gene.gene_symbol;
+
         return clone;
     }
 
@@ -187,8 +220,12 @@ export class FunctionalAssayForm extends BaseEntityForm
                                 : clone.assay_classes;
 
         clone.publication_id = clone.publication
-                                // ? {value: clone.publication.id, label: clone.publication.name}
-                                // : null
+
+        clone.gene = {
+            hgnc_id: parseInt(clone.hgnc_id.substr(5)),
+            gene_symbol: clone.gene_symbol
+        }
+
         return clone;
     }
 

@@ -12,7 +12,7 @@ use Lorisleiva\Actions\Concerns\AsController;
 
 class FunctionalAssayUpdate
 {
-    	use AsController;
+    use AsController;
 
     public function handle(FunctionalAssay $functionalAssay, $newData)
     {
@@ -41,6 +41,7 @@ class FunctionalAssayUpdate
             'affiliation_id' => 'filled|int',
             'publication_id' => 'filled|int|exists:publications,id',
             'hgnc_id' => 'filled|regex:/^HGNC:\d+$/',
+            'gene_symbol' => 'nullable|max:255',
             'approved' => 'nullable|boolean',
             'material_used' => 'nullable',
             'patient_derived_material_used' => 'nullable',
@@ -75,5 +76,4 @@ class FunctionalAssayUpdate
     {
         return true;
     }
-
 }

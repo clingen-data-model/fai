@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Actions;
+
 use App\Models\FunctionalAssay;
 use Illuminate\Validation\Rule;
 use App\Events\FunctionalAssaySaved;
@@ -11,7 +12,7 @@ use Lorisleiva\Actions\Concerns\AsController;
 
 class FunctionalAssayCreate
 {
-    	use AsController;
+    use AsController;
 
     public function handle(array $functionalAssayData, array $assayClassIds)
     {
@@ -45,6 +46,7 @@ class FunctionalAssayCreate
             'affiliation_id' => 'required|int',
             'publication_id' => 'required|int|exists:publications,id',
             'hgnc_id' => 'required|regex:/^HGNC:\d+$/',
+            'gene_symbol' => 'nullable|max:255',
             'approved' => 'nullable|boolean',
             'material_used' => 'nullable',
             'patient_derived_material_used' => 'nullable',
@@ -79,5 +81,4 @@ class FunctionalAssayCreate
     {
         return true;
     }
-
 }

@@ -84,7 +84,7 @@
             'onUpdate:modelValue': (value) => { fieldValue.value = value },
             type: props.field.type || 'text',
             placeholder: props.field.placeholder || null,
-            errors: props.errors[props.field.name],
+            errors: props.errors[props.field.errorKey || props.field.name],
             options: resolveOptions(props.field),
             vertical: props.field.vertical,
             class: (props.field.class || '') + (props.field.required ? 'required' : ''),

@@ -10,7 +10,7 @@ function inView(elem)
     }
     const parentBounding = elem.parentNode.getBoundingClientRect();
     if (
-        itemBounding.top >= parentBounding.top 
+        itemBounding.top >= parentBounding.top
         && itemBounding.bottom <= parentBounding.bottom
     ) {
         return true;
@@ -103,8 +103,8 @@ export default {
             return this.filteredOptions.length > 0 || this.hasAdditionalOption;
         },
         optionsListHeight () {
-            return this.showingOptions 
-                    ? this.optionsHeight 
+            return this.showingOptions
+                    ? this.optionsHeight
                     : 0;
         },
         selection() {
@@ -354,7 +354,7 @@ export default {
     <!-- <div class="search-select-component" v-click-outside="{handler: ()=> {}, exclude: []}"> -->
     <div class="search-select-component">
         <div class="search-select-container bg-white">
-            <div v-if="hasSelection" 
+            <div v-if="hasSelection"
                 v-for="selection, idx in selections" :key="idx"
                 class="selection" :class="{disabled: disabled}"
             >
@@ -362,18 +362,18 @@ export default {
                     <slot name="selection-label" :selection="selection">
                         {{resolveDefaultOptionLabel(selection)}}
                     </slot>
-                </label>  
-                <div 
-                    @click="removeSelection(idx)" 
-                    :disabled="disabled" 
+                </label>
+                <div
+                    @click="removeSelection(idx)"
+                    :disabled="disabled"
                     class="remove-btn"
                 >x</div>
             </div>
-            <input 
+            <input
                 v-show="showInput"
-                type="text" 
-                v-model="searchText" 
-                ref="input" 
+                type="text"
+                v-model="searchText"
+                ref="input"
                 class="input"
                 @keydown="handleKeyDown"
                 @keyup="handleKeyEvent"
@@ -386,8 +386,8 @@ export default {
         </div>
         <div v-show="showingOptions" class="result-container">
             <ul class="option-list" :style="`max-height: ${optionsListHeight}px`">
-                <li v-for="(opt, idx) in filteredUniqueOptions" 
-                    :key="idx" 
+                <li v-for="(opt, idx) in filteredUniqueOptions"
+                    :key="idx"
                     class="filtered-option"
                     :class="{highlighted: (idx === cursorPosition)}"
                     :id="`option-${idx}`"
@@ -434,7 +434,7 @@ export default {
     .remove-btn {
         @apply bg-inherit border border-t-0 border-r-0 border-b-0 border-gray-400 rounded-r-md pt-0.5 cursor-pointer;
     }
-    
+
     .search-select-container .input {
         @apply border-none block w-80;
         display: block;
@@ -479,7 +479,7 @@ export default {
     }
     .filtered-option.highlighted {
         @apply bg-blue-200 bg-opacity-50;
-    } 
+    }
     .filtered-option.additional-option {
         @apply border-t border-gray-400 bg-white;
     }
