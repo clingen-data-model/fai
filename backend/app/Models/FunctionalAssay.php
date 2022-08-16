@@ -21,7 +21,7 @@ class FunctionalAssay extends Model
         'material_used',
         'patient_derived_material_used',
         'description',
-        // additional_document: Optional[List[str]] = None
+        'additional_publication_ids',
         'read_out_description',
         'range',
         'normal_range',
@@ -96,6 +96,4 @@ class FunctionalAssay extends Model
     {
         return $query->whereNull('validated_at');
     }
-
-
 }
