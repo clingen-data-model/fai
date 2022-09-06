@@ -1,0 +1,107 @@
+{
+    "header": {
+        "type": "esummary",
+        "version": "0.3"
+    },
+    "result": {
+        "6678417": {
+            "uid": "6678417",
+            "pubdate": "1983",
+            "epubdate": "",
+            "source": "Perception",
+            "authors": [
+                {
+                    "name": "Frijters JE",
+                    "authtype": "Author",
+                    "clusterid": ""
+                },
+                {
+                    "name": "Oude Ophuis PA",
+                    "authtype": "Author",
+                    "clusterid": ""
+                }
+            ],
+            "lastauthor": "Oude Ophuis PA",
+            "title": "The construction and prediction of psychophysical power functions for the sweetness of equiratio sugar mixtures.",
+            "sorttitle": "construction and prediction of psychophysical power functions for the sweetness of equiratio sugar mixtures",
+            "volume": "12",
+            "issue": "6",
+            "pages": "753-67",
+            "lang": [
+                "eng"
+            ],
+            "nlmuniqueid": "0372307",
+            "issn": "0301-0066",
+            "essn": "1468-4233",
+            "pubtype": [
+                "Journal Article"
+            ],
+            "recordstatus": "PubMed - indexed for MEDLINE",
+            "pubstatus": "4",
+            "articleids": [
+                {
+                    "idtype": "pubmed",
+                    "idtypen": 1,
+                    "value": "6678417"
+                },
+                {
+                    "idtype": "doi",
+                    "idtypen": 3,
+                    "value": "10.1068/p120753"
+                },
+                {
+                    "idtype": "rid",
+                    "idtypen": 8,
+                    "value": "6678417"
+                },
+                {
+                    "idtype": "eid",
+                    "idtypen": 8,
+                    "value": "6678417"
+                }
+            ],
+            "history": [
+                {
+                    "pubstatus": "pubmed",
+                    "date": "1983/01/01 00:00"
+                },
+                {
+                    "pubstatus": "medline",
+                    "date": "1983/01/01 00:01"
+                },
+                {
+                    "pubstatus": "entrez",
+                    "date": "1983/01/01 00:00"
+                }
+            ],
+            "references": [],
+            "attributes": [
+                "Has Abstract"
+            ],
+            "pmcrefcount": "",
+            "fulljournalname": "Perception",
+            "elocationid": "",
+            "doctype": "citation",
+            "srccontriblist": [],
+            "booktitle": "",
+            "medium": "",
+            "edition": "",
+            "publisherlocation": "",
+            "publishername": "",
+            "srcdate": "",
+            "reportnumber": "",
+            "availablefromurl": "",
+            "locationlabel": "",
+            "doccontriblist": [],
+            "docdate": "",
+            "bookname": "",
+            "chapter": "",
+            "sortpubdate": "1983/01/01 00:00",
+            "sortfirstauthor": "Frijters JE",
+            "vernaculartitle": ""
+        },
+        "uids": [
+            "6678417"
+        ]
+    }
+}
