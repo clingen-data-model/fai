@@ -2,6 +2,8 @@
     import {h, ref} from 'vue';
     import StaticAlert from '../../components/StaticAlert.vue';
     import SearchSelect from '../../components/forms/SearchSelect.vue';
+    import PublicationLookupField from '../../components/PublicationLookupField.vue';
+import PublicationsAdditionalField from '../../components/PublicationsAdditionalField.vue';
 
     const fields = [
         { name: 'first_name',
@@ -18,10 +20,10 @@
                 component: SearchSelect,
                 options: {
                     options: [
-                        'Mr.', 
-                        'Ms.', 
-                        'Mrs.', 
-                        'Dr.', 
+                        'Mr.',
+                        'Ms.',
+                        'Mrs.',
+                        'Dr.',
                         'Prof.',
                     ],
                     labelField: 'name',
@@ -58,21 +60,38 @@
             show: (model) => {
                 return model.value.bad_options == 2
             }
+        },
+        { name: 'publication',
+            label: 'PubMed ID',
+            type: 'component',
+            component: {
+                component: PublicationLookupField
+            }
+        },
+        { name: 'otherPublications',
+            label: 'Other Publications',
+            type: 'component',
+            component: {
+                component: PublicationsAdditionalField
+            }
+
         }
     ]
 
-    const model = ref({});
+    const model = ref({
+        // otherPublications: []
+    });
     const errors = ref({})
 </script>
 
 <template>
     <ScreenTemplate title="Example Form">
         <div class="flex items-start space-x-8">
-            <DataForm 
-                :fields="fields" 
-                v-model="model" 
+            <DataForm
+                :fields="fields"
+                v-model="model"
                 :errors="errors"
-                class="w-1/2 flex-grow-1"
+                class="w-3/4 flex-grow-1"
                 wrapperClass="my-4"
             />
             <div>
