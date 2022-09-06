@@ -17,7 +17,7 @@ class FunctionalAssayCreateTest extends TestCase
     use FunctionalAssayTestHelpers;
     use RefreshDatabase;
 
-    public function setup():void
+    public function setup(): void
     {
         parent::setup();
         $this->createAssayClass();
@@ -95,7 +95,7 @@ class FunctionalAssayCreateTest extends TestCase
             'significance_threshold' => str_repeat("X", 256),
             'units' => str_repeat('X', 256),
             'ep_proposed_strength_pathogenic' => str_repeat('X', 256),
-            'ep_propsed_strength_benign' => str_repeat('X', 256),
+            'ep_proposed_strength_benign' => str_repeat('X', 256),
             'field_notes' => 'beans'
         ])
         ->assertValidationErrors([
@@ -114,7 +114,7 @@ class FunctionalAssayCreateTest extends TestCase
             'significance_threshold' => 'This must not be greater than 255 characters.',
             'units' => 'This must not be greater than 255 characters.',
             'ep_proposed_strength_pathogenic' => 'This must not be greater than 255 characters.',
-            'ep_propsed_strength_benign' => 'This must not be greater than 255 characters.',
+            'ep_proposed_strength_benign' => 'This must not be greater than 255 characters.',
 
         ]);
     }
@@ -157,5 +157,4 @@ class FunctionalAssayCreateTest extends TestCase
 
         return $this->json('POST', '/api/functional-assays', $data);
     }
-
 }

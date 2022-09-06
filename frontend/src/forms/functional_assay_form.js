@@ -6,7 +6,7 @@ import pubRepo from '@/repositories/publication_repository.js'
 import functionalAssayRepo from '@/repositories/functional_assay_repository.js'
 import SearchSelect from '@/components/forms/SearchSelect.vue'
 import FunctionalAssayFieldNoteInput from '@/components/forms/FunctionalAssayFieldNoteInput.vue'
-
+import PublicationLookupField from '@/components/PublicationLookupField.vue'
 
 const assayClassOptions = ref([]);
 const publicationOptions = ref([]);
@@ -63,7 +63,7 @@ export const fields = ref([
                     options: {
                         options: assayClassOptions,
                         labelField: 'name',
-                        showOptionsOnFocus: true,
+                    showOptionsOnFocus: true,
                         multiple: true
                     },
                     slots: {
@@ -83,23 +83,22 @@ export const fields = ref([
                 label: 'Publication',
                 type: 'component',
                 component: {
-                    component: markRaw(SearchSelect),
-                    options: {
-                        options: publicationOptions,
-                        labelField: 'name',
-                        showOptionsOnFocus: true,
-                    },
-                    slots: {
-                        additionalOption: () => {
-                            return h('a', { href: `#create-publication`, innerHTML: 'Create new Publication', class: 'btn xs' })
-                        }
-                    }
+                    component: markRaw(PublicationLookupField),
                 },
                 required: true,
                 display: (val) => {
                     return val.name+' - '+val.author+', '+val.year;
                 }
             },
+            // {
+            //     name: 'additional_publication_ids',
+            //     label: 'Additional Publications',
+            //     type: 'component',
+            //     component: {
+            //         component: markRaw(PublicationLookupField),
+            //     },
+            //     required: false,
+            // },
             {
                 name: 'approved',
                 type: 'select',
@@ -200,9 +199,6 @@ export class FunctionalAssayForm extends BaseEntityForm
     prepareDataForStore (data) {
         const clone = {...data}
         clone.assay_class_ids = clone.assay_class_ids ? clone.assay_class_ids.map(ac => ac.id) : undefined;
-        clone.publication_id =  clone.publication_id
-                                ? clone.publication_id.id
-                                : clone.publciation_id;
 
         clone.hgnc_id = 'HGNC:'+clone.gene.hgnc_id;
         clone.gene_symbol = clone.gene.gene_symbol;
@@ -218,8 +214,6 @@ export class FunctionalAssayForm extends BaseEntityForm
                                     return i;
                                 })
                                 : clone.assay_classes;
-
-        clone.publication_id = clone.publication
 
         clone.gene = {
             hgnc_id: parseInt(clone.hgnc_id.substr(5)),

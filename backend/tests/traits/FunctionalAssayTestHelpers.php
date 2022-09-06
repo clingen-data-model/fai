@@ -8,7 +8,7 @@ use Tests\traits\SetsUpPublication;
 /**
  * Methods for setting up CodingSystem
  */
-trait FunctionalAssayTestHelpers 
+trait FunctionalAssayTestHelpers
 {
     use SetsUpPublication;
     use SetsUpAssayClass;
@@ -28,7 +28,7 @@ trait FunctionalAssayTestHelpers
         return FunctionalAssay::factory()->create($data);
     }
 
-    
+
     private function getDefaultData(): array
     {
         return [
@@ -60,8 +60,8 @@ trait FunctionalAssayTestHelpers
             'ep_basic_positive_control' => 'some text',
             'ep_basic_negative_control' => 'some text',
             'ep_proposed_strength_pathogenic' => 'some text',
-            'ep_propsed_strength_benign' => 'some text',
+            'ep_proposed_strength_benign' => 'some text',
         ];
     }
-    
+
 }

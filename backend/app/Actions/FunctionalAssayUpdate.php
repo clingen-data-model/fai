@@ -68,7 +68,7 @@ class FunctionalAssayUpdate
             'ep_basic_positive_control' => 'nullable',
             'ep_basic_negative_control' => 'nullable',
             'ep_proposed_strength_pathogenic' => 'nullable|max:255',
-            'ep_propsed_strength_benign' => 'nullable|max:255',
+            'ep_proposed_strength_benign' => 'nullable|max:255',
          ];
     }
 

@@ -42,7 +42,7 @@ class FunctionalAssay extends Model
         'ep_basic_positive_control',
         'ep_basic_negative_control',
         'ep_proposed_strength_pathogenic',
-        'ep_propsed_strength_benign',
+        'ep_proposed_strength_benign',
         'raw_import_id',
         'validated_at'
     ];
