@@ -2,21 +2,26 @@
 
 namespace App\Actions;
 
+use Carbon\Carbon;
 use App\Models\FunctionalAssay;
 use Illuminate\Validation\Rule;
 use App\Events\FunctionalAssaySaved;
 use Lorisleiva\Actions\ActionRequest;
 use App\Events\FunctionalAssayCreated;
-use Carbon\Carbon;
+use App\Actions\PublicationFindOrCreate;
 use Lorisleiva\Actions\Concerns\AsController;
 
 class FunctionalAssayCreate
 {
     use AsController;
 
+    public function __construct(private PublicationFindOrCreate $findOrCreatePublication)
+    {}
+
     public function handle(array $functionalAssayData, array $assayClassIds)
     {
         $funcAssay = FunctionalAssay::create($functionalAssayData);
+
         foreach ($assayClassIds as $id) {
             $funcAssay->assayClasses()
                 ->attach($id);
@@ -30,8 +35,25 @@ class FunctionalAssayCreate
 
     public function asController(ActionRequest $request)
     {
-        $funcAssayData = $request->safe()->except('assay_class_ids');
+        $funcAssayData = $request->safe()->except('assay_class_ids', 'publication', 'additional_publications');
         $funcAssayData['validated_at'] = Carbon::now();
+
+        $publicationData = $request->safe()->only('publication')['publication'];
+
+        // Find or create a publication based on input.
+        $funcAssayData['publication_id'] = $this->findOrCreatePublication->handle([
+            'coding_system_id' => $publicationData['coding_system_id'],
+            'code' => $publicationData['code']
+        ], $publicationData)->id;
+
+        // Find or create additional publications based on input.
+        $funcAssayData['additional_publication_ids'] = collect($request->additional_publications)
+                                                        ->map(function ($pData) {
+                                                            return $this->findOrCreatePublication->handle([
+                                                                'coding_system_id' => $pData['coding_system_id'],
+                                                                'code' => $pData['code']
+                                                            ], $pData)->id;
+                                                        })->toArray();
 
         $assayClassIds = $request->safe()->only('assay_class_ids');
         $functionalAssay = $this->handle($funcAssayData, $assayClassIds);
@@ -44,7 +66,14 @@ class FunctionalAssayCreate
     {
         return [
             'affiliation_id' => 'required|int',
-            'publication_id' => 'required|int|exists:publications,id',
+            'publication' => 'required|array',
+            'publication.coding_system_id' => 'required|int|exists:coding_systems,id',
+            'publication.code' => 'required|max:255',
+            'publication.title' => 'nullable',
+            'publication.author' => 'nullable',
+            'publication.year' => 'nullable',
+            'additional_publication_ids' => 'nullable|array',
+            'additional_publications_ids.*' => 'int',
             'hgnc_id' => 'required|regex:/^HGNC:\d+$/',
             'gene_symbol' => 'nullable|max:255',
             'approved' => 'nullable|boolean',

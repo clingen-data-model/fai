@@ -33,7 +33,14 @@ trait FunctionalAssayTestHelpers
     {
         return [
             'affiliation_id' => 50001,
-            'publication_id' => $this->publication->id,
+            // 'publication_id' => $this->publication->id,
+            'publication' => [
+                'coding_system_id' => $this->codingSystem->id,
+                'code' => '12345',
+                'title' => 'some dumb title',
+                'author' => 'Bob D',
+                'year' => 1988
+            ],
             'hgnc_id' => 'HGNC:12345',
             'approved' => false,
             'material_used' => 'a b c d',

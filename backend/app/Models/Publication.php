@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\CodingSystem;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -31,7 +32,7 @@ class Publication extends Model
     public $appends = [
         'name'
     ];
-    
+
     /**
      * Get the codingSystem that owns the Publication
      *
@@ -52,17 +53,36 @@ class Publication extends Model
         return $this->hasMany(FunctionalAssay::class);
     }
 
+    // ACCESSORS
+    public function getNameAttribute()
+    {
+        if (isset($this->attributes['title'])) {
+            return $this->attributes['title'];
+        }
+
+        return $this->codingSystem->name.':'.$this->code;
+    }
+
+    // REPOSITORY METHODS
+
     /**
-     * ACCESSORS
+     * Finds a publication based on it's coding system and systen id (i.e. code)
+     *
+     * @param mixed $system Coding System ID, kebab-cased name, or numeric id.
+     * @param string $code Code used to identify the publication within the coding system.
      */
+    public static function findBySystemAndCode($system, string $code): ?Publication
+    {
+        $codingSystemId = $system;
+        if (is_object($system) && get_class($system) == CodingSystem::class) {
+            $codingSystemId = $system->id;
+        }
+        if (is_string($system)) {
+            $codingSystemId = config('publications.coding_systems.'.$system.'.id');
+        }
 
-         public function getNameAttribute()
-         {
-             if (isset($this->attributes['title'])) {
-                return $this->attributes['title'];
-             }
-
-             return $this->codingSystem->name.':'.$this->code;
-         }
-     
+        return static::query()
+                ->where(['coding_system_id' => $codingSystemId, 'code' => $code])
+                ->first();
+    }
 }

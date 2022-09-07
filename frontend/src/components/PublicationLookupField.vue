@@ -6,7 +6,7 @@
 
     const props = defineProps({
         modelValue: {
-            type: String,
+            type: Object,
         }
     });
 
@@ -22,32 +22,58 @@
     })
 
     const pubInfo = ref({});
+    const pubLoading = ref(false);
     const lookupPublication = debounce(async () => {
-        console.log('lookupPublication: ',props.modelValue)
-        if (!props.modelValue) {
+        if (!props.modelValue.code) {
             pubInfo.value = null;
             return;
         }
         const baseUri = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils';
-        const entriesUrl = `${baseUri}/esummary.fcgi?db=pubmed&id=${props.modelValue}&retmode=json`
+        const entriesUrl = `${baseUri}/esummary.fcgi?db=pubmed&id=${props.modelValue.code}&retmode=json`
 
+        pubLoading.value = true
         pubInfo.value = await axios.get(entriesUrl)
             .then(rsp => {
-                return rsp.data.result[props.modelValue]
+                pubLoading.value = false
+                return rsp.data.result[props.modelValue.code]
+
             })
             .catch(async error => {
                 console.log(error);
             });
+
+        workingCopy.value.title = pubInfo.value.title;
+        workingCopy.value.author = pubInfo.value.sortfirstauthor;
+        workingCopy.value.year = pubInfo.value.pubdate.substring(0, 4)
     }, 250)
 
     const pubLabel = computed(() => {
+        if (pubLoading.value) {
+            return 'loading...'
+        }
         if (!pubInfo.value) {
             return '';
         }
         return `${pubInfo.value.sortfirstauthor} et. al. - ${pubInfo.value.pubdate}`
     })
+    const pubBadgeColor = computed(() => {
+        if (pubLoading.value) {
+            return 'gray';
+        }
 
-    watch(() => props.modelValue, () => {
+        return 'blue';
+    })
+
+    watch(() => props.modelValue, (to) => {
+        console.log(to)
+        if (to.title) {
+            pubInfo.value = {
+                title: to.title,
+                sortfirstauthor: to.author,
+                pubdate: to.year
+            }
+            return;
+        }
         lookupPublication()
     }, {immediate: true})
 
@@ -55,18 +81,13 @@
 
 <template>
     <div class="flex space-x-2">
-        <input type="text" v-model="workingCopy">
+        <input type="text" v-model="modelValue.code" @update:modelValue="lookupPublication">
         <div>
-            <PopOver hover arrow>
-                <a :href="`https://pubmed.ncbi.nlm.nih.gov/${modelValue}`" target="pubmed" v-if="pubInfo">
-                    <badge size="xs">{{pubLabel}}</badge>
-                </a>
-                <template v-slot:content>
-                    <div style="width: 300px">
-                        <PubmedCitation :summary="pubInfo" />
-                    </div>
-                </template>
-            </PopOver>
+            <a :href="`https://pubmed.ncbi.nlm.nih.gov/${modelValue.code}`" target="pubmed" v-if="pubInfo">
+                <badge size="xs" :color="pubBadgeColor">
+                    {{pubLabel}}
+                </badge>
+            </a>
         </div>
     </div>
 </template>

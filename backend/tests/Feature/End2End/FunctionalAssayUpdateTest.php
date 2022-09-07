@@ -2,13 +2,15 @@
 
 namespace Tests\Feature\End2End;
 
+use Carbon\Carbon;
+use App\Models\Publication;
+use App\Models\CodingSystem;
 use App\Models\FunctionalAssay;
 use Tests\Feature\End2End\TestCase;
 use App\Events\FunctionalAssaySaved;
 use Illuminate\Testing\TestResponse;
 use Illuminate\Support\Facades\Event;
 use App\Events\FunctionalAssayUpdated;
-use Carbon\Carbon;
 use Tests\traits\FunctionalAssayTestHelpers;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -25,8 +27,14 @@ class FunctionalAssayUpdateTest extends TestCase
         $thirdAssayClass = $this->createAssayClass();
 
         $data = $expectedData = $this->getDefaultData();
+
+        $publication = Publication::factory()->create(['coding_system_id' => $data['publication']['coding_system_id'], 'code' => 12345]);
+
         $data['assay_class_ids'] = [1,$thirdAssayClass->id];
         unset($expectedData['assay_class_ids']);
+        unset($expectedData['publication']);
+        // $expectedData['publication_id'] = $publication->id;
+        // $expectedData['publication'] = $publication->toArray();
 
         $this->makeRequest($data)
             ->assertStatus(200)
@@ -47,6 +55,51 @@ class FunctionalAssayUpdateTest extends TestCase
         ]);
     }
 
+    /**
+     * @test
+     */
+    public function updates_functionalAssay_with_additional_publications()
+    {
+        $data = $expectedData = $this->getDefaultData();
+
+        $publication = Publication::factory()->create(['coding_system_id' => $data['publication']['coding_system_id'], 'code' => 12345]);
+
+        $this->functionalAssay->update(['additional_publication_ids' => [$publication->id]]);
+
+        $data['additional_publications'] = [
+            [
+                'coding_system_id' => $publication->coding_system_id,
+                'code' => $publication->code,
+                'title' => $publication->title,
+                'author' => $publication->author,
+                'year' => $publication->year
+            ],
+            [
+                'coding_system_id' => $data['publication']['coding_system_id'],
+                'code' => 666,
+                'title' => 'Book of the dead',
+                'year' => 1066,
+                'author' => 'lucifer morningstar'
+            ]
+        ];
+
+        $this->makeRequest($data)
+            ->assertStatus(200);
+            // ->assertJson($expectedData);
+
+        unset($expectedData['additional_publications']);
+        $expectedData['additional_publication_ids'] = collect([
+            Publication::findBySystemAndCode($publication->coding_system_id, $publication->code),
+            Publication::findBySystemAndCode($data['publication']['coding_system_id'], 666),
+        ])->pluck('id')->toJson();
+
+        $this->assertDatabaseHas('functional_assays', [
+            'id' => $this->functionalAssay->id,
+            'additional_publication_ids' => $expectedData['additional_publication_ids']
+        ]);
+    }
+
+
 
     /**
      * @test
@@ -55,7 +108,7 @@ class FunctionalAssayUpdateTest extends TestCase
     {
         $this->makeRequest([
             'affiliation_id' => null,
-            'publication_id' => null,
+            'publication' => null,
             'replication' => null,
             'statistical_analysis_description' => null,
             'range_type' => null,
@@ -63,7 +116,7 @@ class FunctionalAssayUpdateTest extends TestCase
         ])
             ->assertValidationErrors([
                 'affiliation_id' => 'This must have a value.',
-                'publication_id' => 'This must have a value.',
+                'publication' => 'This must have a value.',
                 'replication' => 'This must have a value.',
                 'statistical_analysis_description' => 'This must have a value.',
                 'range_type' => 'This must have a value.',
@@ -78,7 +131,10 @@ class FunctionalAssayUpdateTest extends TestCase
     {
         $this->makeRequest([
             'affiliation_id' => 'blah',
-            'publication_id' => 999,
+            'publication' => [
+                'coding_system_id' => 999,
+                'code' => str_repeat('X', 256)
+            ],
             'hgnc_id' => 'blah',
             'range_type' => 'blah',
             'approved' => 'blah',
@@ -97,7 +153,7 @@ class FunctionalAssayUpdateTest extends TestCase
         ])
         ->assertValidationErrors([
             'affiliation_id' => 'This must be an integer',
-            'publication_id' => 'The selection is invalid',
+            'publication.coding_system_id' => 'The selection is invalid',
             'hgnc_id' => 'The format is invalid.',
             'range_type' => 'The selection is invalid.',
             'approved' => 'This must be true or false.',

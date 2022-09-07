@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Publication;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,6 +17,7 @@ class FunctionalAssay extends Model
     public $fillable = [
         'affiliation_id',
         'publication_id',
+        'additional_publication_ids',
         'hgnc_id',
         'gene_symbol',
         'approved',
@@ -50,6 +53,7 @@ class FunctionalAssay extends Model
     public $casts = [
         'affiliation_id' => 'integer',
         'publication_id' => 'integer',
+        'additional_publication_ids' => 'array',
         'raw_import_id' => 'integer',
         'approved' => 'boolean',
         'field_notes' => 'array',
@@ -86,7 +90,7 @@ class FunctionalAssay extends Model
         return $this->hasMany(Snapshot::class);
     }
 
-    //SCOPE
+    // SCOPE
     public function scopeIsValidated($query)
     {
         return $query->whereNotNull('validated_at');
@@ -96,4 +100,11 @@ class FunctionalAssay extends Model
     {
         return $query->whereNull('validated_at');
     }
+
+    // ACCESSORS
+    public function getAdditionalPublicationsAttribute(): Collection
+    {
+        return Publication::query()->whereIn('id', $this->additional_publication_ids ?? [])->get() ?? [];
+    }
+
 }

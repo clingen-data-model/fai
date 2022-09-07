@@ -2,7 +2,7 @@
     import {h, ref} from 'vue';
     import StaticAlert from '../../components/StaticAlert.vue';
     import SearchSelect from '../../components/forms/SearchSelect.vue';
-    import PublicationLookupField from '../../components/PublicationLookupField.vue';
+    import PublicationField from '../../components/PublicationField.vue';
 import PublicationsAdditionalField from '../../components/PublicationsAdditionalField.vue';
 
     const fields = [
@@ -65,7 +65,7 @@ import PublicationsAdditionalField from '../../components/PublicationsAdditional
             label: 'PubMed ID',
             type: 'component',
             component: {
-                component: PublicationLookupField
+                component: PublicationField
             }
         },
         { name: 'otherPublications',
@@ -86,7 +86,7 @@ import PublicationsAdditionalField from '../../components/PublicationsAdditional
 
 <template>
     <ScreenTemplate title="Example Form">
-        <div class="flex items-start space-x-8">
+        <flex  class="items-start space-x-8">
             <DataForm
                 :fields="fields"
                 v-model="model"
@@ -94,10 +94,10 @@ import PublicationsAdditionalField from '../../components/PublicationsAdditional
                 class="w-3/4 flex-grow-1"
                 wrapperClass="my-4"
             />
-            <div>
+            <div class="overflow-x-scroll flex-grow-0">
                 <h2>ModelValue</h2>
-                <pre class="flex-grow-1">{{model}}</pre>
+                <pre class="">{{model}}</pre>
             </div>
-        </div>
+        </flex>
     </ScreenTemplate>
 </template>

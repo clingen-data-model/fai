@@ -8,6 +8,7 @@ use App\Events\FunctionalAssaySaved;
 use Illuminate\Testing\TestResponse;
 use Illuminate\Support\Facades\Event;
 use App\Events\FunctionalAssayCreated;
+use App\Models\Publication;
 use Tests\traits\SetsUpFunctionalAssay;
 use Tests\traits\FunctionalAssayTestHelpers;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -31,14 +32,58 @@ class FunctionalAssayCreateTest extends TestCase
     {
         $expected = $this->getDefaultData();
         unset($expected['assay_class_ids']);
+        unset($expected['publication']);
 
         $this->makeRequest()
             ->assertStatus(201)
             ->assertJson($expected);
 
+        $expected['publication_id'] = Publication::orderBy('id', 'desc')->first()->id;
 
         $this->assertDatabaseHas('functional_assays', $this->jsonifyArrays($expected));
     }
+
+    /**
+     * @test
+     */
+    public function creates_FunctionalAssay_with_additional_publications()
+    {
+        $expected = $data = $this->getDefaultData();
+        unset($expected['assay_class_ids']);
+        unset($expected['publication']);
+
+        $data['additional_publications'] = [
+            [
+                'coding_system_id' => $this->codingSystem->id,
+                'code' => '999',
+                'title' => 'Beans for lunch',
+                'year' => '1977',
+                'author' => 'Bobb D'
+            ],
+            [
+                'coding_system_id' => $this->codingSystem->id,
+                'code' => 1234,
+                'title' => 'A slow regard for silent things',
+                'year' => 2016,
+                'author' => 'Ruthfuss P'
+            ]
+        ];
+
+
+        $this->makeRequest($data)
+            ->assertStatus(201)
+            ->assertJson($expected);
+
+        $pubs = collect([
+            Publication::findBySystemAndCode($this->codingSystem, '999'),
+            Publication::findBySystemAndCode($this->codingSystem, '1234')
+        ]);
+
+        $this->assertDatabaseHas('functional_assays', [
+            'additional_publication_ids' => json_encode($pubs->pluck('id')->toArray())
+        ]);
+    }
+
 
     /**
      * @test
@@ -64,7 +109,8 @@ class FunctionalAssayCreateTest extends TestCase
         $this->makeRequest([])
             ->assertValidationErrors([
                 'affiliation_id' => 'This is required.',
-                'publication_id' => 'This is required.',
+                'publication.coding_system_id' => 'This is required.',
+                'publication.code' => 'This is required.',
                 'replication' => 'This is required.',
                 'statistical_analysis_description' => 'This is required.',
                 'range_type' => 'This is required.',
@@ -79,13 +125,15 @@ class FunctionalAssayCreateTest extends TestCase
     {
         $this->makeRequest([
             'affiliation_id' => 'blah',
-            'publication_id' => 999,
+            'publication' => [
+                'coding_system_id' => 999,
+                'code' => str_repeat("X", 256),
+            ],
             'hgnc_id' => 'blah',
             'range_type' => 'blah',
             'approved' => 'blah',
             'material_used' => 'blah',
             'patient_derived_material_used' => 'blah',
-
             'range' => str_repeat("X", 256),
             'normal_range' => str_repeat("X", 256),
             'abnormal_range' => str_repeat("X", 256),
@@ -100,7 +148,8 @@ class FunctionalAssayCreateTest extends TestCase
         ])
         ->assertValidationErrors([
             'affiliation_id' => 'This must be an integer.',
-            'publication_id' => 'The selection is invalid.',
+            'publication.coding_system_id' => 'The selection is invalid.',
+            'publication.code' => 'This must not be greater than 255 characters.',
             'hgnc_id' => 'The format is invalid.',
             'range_type' => 'The selection is invalid.',
             'approved' => 'This must be true or false.',
@@ -115,7 +164,6 @@ class FunctionalAssayCreateTest extends TestCase
             'units' => 'This must not be greater than 255 characters.',
             'ep_proposed_strength_pathogenic' => 'This must not be greater than 255 characters.',
             'ep_proposed_strength_benign' => 'This must not be greater than 255 characters.',
-
         ]);
     }
 

@@ -6,7 +6,8 @@ import pubRepo from '@/repositories/publication_repository.js'
 import functionalAssayRepo from '@/repositories/functional_assay_repository.js'
 import SearchSelect from '@/components/forms/SearchSelect.vue'
 import FunctionalAssayFieldNoteInput from '@/components/forms/FunctionalAssayFieldNoteInput.vue'
-import PublicationLookupField from '@/components/PublicationLookupField.vue'
+import PublicationField from '@/components/PublicationField.vue'
+import PublicationsAdditionalField from '@/components/PublicationsAdditionalField.vue'
 
 const assayClassOptions = ref([]);
 const publicationOptions = ref([]);
@@ -79,26 +80,29 @@ export const fields = ref([
                 }
             },
             {
-                name: 'publication_id',
+                name: 'publication',
                 label: 'Publication',
                 type: 'component',
                 component: {
-                    component: markRaw(PublicationLookupField),
+                    component: markRaw(PublicationField),
                 },
                 required: true,
                 display: (val) => {
                     return val.name+' - '+val.author+', '+val.year;
                 }
             },
-            // {
-            //     name: 'additional_publication_ids',
-            //     label: 'Additional Publications',
-            //     type: 'component',
-            //     component: {
-            //         component: markRaw(PublicationLookupField),
-            //     },
-            //     required: false,
-            // },
+            {
+                name: 'additional_publications',
+                label: 'Additional Publications',
+                type: 'component',
+                component: {
+                    component: markRaw(PublicationsAdditionalField),
+                },
+                required: false,
+                display: (val) => {
+                    return val.map(pub => ' * '+pub.name+' - '+pub.author+', '+pub.year).join('\n')
+                }
+            },
             {
                 name: 'approved',
                 type: 'select',
@@ -198,6 +202,7 @@ export class FunctionalAssayForm extends BaseEntityForm
 
     prepareDataForStore (data) {
         const clone = {...data}
+        console.log(clone);
         clone.assay_class_ids = clone.assay_class_ids ? clone.assay_class_ids.map(ac => ac.id) : undefined;
 
         clone.hgnc_id = 'HGNC:'+clone.gene.hgnc_id;

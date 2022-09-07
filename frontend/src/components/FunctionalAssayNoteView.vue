@@ -12,7 +12,6 @@
     })
 
     const fieldNote = computed(() => {
-        console.log(props.fieldNotes);
         if (!props.fieldNotes) {
             return null
         }

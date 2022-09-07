@@ -5,7 +5,6 @@ namespace Tests\Feature\End2End;
 use Tests\TestCase;
 use Illuminate\Testing\TestResponse;
 use App\Actions\FunctionalAssayCreate;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\traits\FunctionalAssayTestHelpers;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -30,16 +29,17 @@ class SnapshotCreateTest extends TestCase
             'data->hgnc_id' => 'HGNC:12345'
         ]);
     }
-    
+
     /**
      * @test
      */
     public function snapshot_created_when_functional_assay_updated()
     {
         $data = $this->getDefaultData();
+        $data['publication_id'] = $this->publication->id;
         $assayClassIds = $data['assay_class_ids'];
         $faData = $data;
-        $this->functionalAssay = (new FunctionalAssayCreate())->handle($faData, $assayClassIds);
+        $this->functionalAssay = app()->make(FunctionalAssayCreate::class)->handle($faData, $assayClassIds);
 
         $data = $this->getDefaultData();
         $data['hgnc_id'] = 'HGNC:98765';
@@ -66,6 +66,6 @@ class SnapshotCreateTest extends TestCase
 
         return $this->json('PUT', '/api/functional-assays/'.$this->functionalAssay->id, $data);
     }
-    
-    
+
+
 }

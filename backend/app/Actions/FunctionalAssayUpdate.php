@@ -2,17 +2,23 @@
 
 namespace App\Actions;
 
+use Carbon\Carbon;
+use App\Models\Publication;
 use App\Models\FunctionalAssay;
 use Illuminate\Validation\Rule;
 use App\Events\FunctionalAssaySaved;
 use Lorisleiva\Actions\ActionRequest;
 use App\Events\FunctionalAssayUpdated;
-use Carbon\Carbon;
 use Lorisleiva\Actions\Concerns\AsController;
 
 class FunctionalAssayUpdate
 {
     use AsController;
+
+    public function __construct(private PublicationFindOrCreate $findOrCreatePublication)
+    {
+    }
+
 
     public function handle(FunctionalAssay $functionalAssay, $newData)
     {
@@ -29,8 +35,28 @@ class FunctionalAssayUpdate
 
     public function asController(ActionRequest $request, FunctionalAssay $functionalAssay)
     {
-        $data = $request->validated();
+        $data = $request->safe()->except('publication');
         $data['validated_at'] = Carbon::now();
+
+        $pubData = $request->safe()->publication;
+
+        // Find or create a publication based on input.
+        $data['publication_id'] = $this->findOrCreatePublication->handle([
+            'coding_system_id' => $pubData['coding_system_id'],
+            'code' => $pubData['code']
+        ], $pubData)->id;
+
+        if ($request->additional_publications) {
+            // Find or create additional publications based on input.
+            $data['additional_publication_ids'] = collect($request->additional_publications)
+                                                            ->map(function ($pData) {
+                                                                return $this->findOrCreatePublication->handle([
+                                                                    'coding_system_id' => $pData['coding_system_id'],
+                                                                    'code' => $pData['code']
+                                                                ], $pData)->id;
+                                                            })->toArray();
+        }
+
 
         return $this->handle($functionalAssay, $data);
     }
@@ -39,7 +65,14 @@ class FunctionalAssayUpdate
     {
         return [
             'affiliation_id' => 'filled|int',
-            'publication_id' => 'filled|int|exists:publications,id',
+            'publication' => 'filled|array',
+            'publication.coding_system_id' => 'filled|int|exists:coding_systems,id',
+            'publication.code' => 'filled|max:255',
+            'publication.title' => 'nullable',
+            'publication.year' => 'nullable',
+            'publication.author' => 'nullable',
+            'additional_publications' => 'nullable|array',
+            // 'additional_publications.*' => 'int',
             'hgnc_id' => 'filled|regex:/^HGNC:\d+$/',
             'gene_symbol' => 'nullable|max:255',
             'approved' => 'nullable|boolean',
@@ -72,8 +105,22 @@ class FunctionalAssayUpdate
          ];
     }
 
-    public function authorize(ActionRequest $requeset):bool
+    public function authorize(ActionRequest $requeset): bool
     {
         return true;
     }
+
+    private function getPublicationIdForCode($system, $code): int
+    {
+        $pub = Publication::findBySystemAndCode($system, $code);
+        if (!$pub) {
+            $pub = $this->createPublication->handle([
+                'coding_system_id' => config('publications.coding_systems.'.$system.'.id'),
+                'code' => $code
+            ]);
+        }
+
+        return $pub->id;
+    }
+
 }

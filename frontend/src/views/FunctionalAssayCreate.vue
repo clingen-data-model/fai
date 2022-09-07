@@ -5,7 +5,7 @@
     import routeHash from '@/composables/route_hash.js'
     import AssayClassCreateDialog from './AssayClassCreateDialog.vue'
     import PublicationCreateDialog from './PublicationCreateDialog.vue'
-import {api} from '../http'
+    import {api} from '../http'
 
     const route = useRoute();
     const router = useRouter();
@@ -13,7 +13,6 @@ import {api} from '../http'
     const rawImportId = ref();
     const rawImport = ref({data: {}});
     const fetchRawImport = async (id) => {
-        // console.log('IMPLEMENT fetchRawImport!!');
         rawImport.value = await api.get(`/raw-imports/${id}`).then(response => response.data);
     }
     watch(() => route.query.rawImportId, (to) => {
@@ -43,7 +42,7 @@ import {api} from '../http'
             <CrudCreate
                 :formDef="formDefinition"
                 :hideOptional="true"
-                class="w-full xl:w-2/3"
+                class="w-full lg:w-2/3"
             />
         </div>
 

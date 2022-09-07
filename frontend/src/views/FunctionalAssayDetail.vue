@@ -4,6 +4,7 @@
     import formDef from '../forms/functional_assay_form';
     import DataFormSection from '../components/forms/DataFormSection.vue';
     import { titleCase } from '../utils';
+import MarkdownBlock from '../components/MarkdownBlock.vue';
 
     const props = defineProps({
         id: {
@@ -48,13 +49,11 @@
                             >
                                 <td class="w-60 border-r">{{titleCase(getLabel(sectionField))}}</td>
                                 <td class="">
-                                    <span v-if="item[sectionField.name]">
-                                        {{
-                                            sectionField.display
-                                                ? sectionField.display(item[sectionField.name])
-                                                : item[sectionField.name]
-                                        }}
-                                    </span>
+                                    <MarkdownBlock v-if="item[sectionField.name]"
+                                        :markdown="sectionField.display
+                                            ? sectionField.display(item[sectionField.name])
+                                            : item[sectionField.name].toString()"
+                                        />
                                     <span v-else class="muted">null</span>
                                     <FunctionalAssayNoteView :fieldNotes="item.field_notes" fieldName="publication_id" />
                                 </td>
@@ -66,3 +65,9 @@
         </div>
     </ScreenTemplate>
 </template>
+
+<style>
+    .markdown ul {
+        @apply pl-4 list-disc;
+    }
+</style>

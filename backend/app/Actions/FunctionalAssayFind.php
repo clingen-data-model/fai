@@ -12,6 +12,7 @@ class FunctionalAssayFind
     public function handle(FunctionalAssay $functionalAssay)
     {
         $functionalAssay->load('assayClasses', 'publication');
+        $functionalAssay->additional_publications = $functionalAssay->getAdditionalPublicationsAttribute();
         return $functionalAssay;
     }
 }
