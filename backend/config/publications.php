@@ -10,5 +10,9 @@ return [
             'id' => 2,
             'name' => 'URI'
         ],
+        'other' => [
+            'id' => 3,
+            'name' => 'Other'
+        ]
     ],
 ];

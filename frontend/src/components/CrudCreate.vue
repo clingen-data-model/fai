@@ -40,7 +40,6 @@
 
 <template>
     <div>
-        <pre>{{currentItem}}</pre>
         <DataForm
             :fields="fields"
             :errors="errors"

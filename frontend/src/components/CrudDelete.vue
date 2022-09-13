@@ -32,7 +32,7 @@
             await props.formDef.destroy(assayClass.value);
             router.go(-1);
         } catch (e) {
-            
+
         }
     }
 
@@ -47,6 +47,5 @@
         <p>This cannot be undone.</p>
         <p>Are you sure you want to continue?</p>
         <ButtonRow submit-text="Delete" @submitted="attemptDelete" @cancel="handleCancel" />
-        <pre>{{currentItem}}</pre>
     </div>
 </template>
